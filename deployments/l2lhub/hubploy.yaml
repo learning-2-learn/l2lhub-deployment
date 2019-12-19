@@ -1,19 +1,12 @@
 images:
-  image_name: # TODO: Full path to your docker image
+  image_name: gcr.io/learning-2-learn-221016/l2lhub-user-image
   registry:
-    provider: # TODO: Pick 'gcloud' or 'aws', and fill up other config accordingly
+    provider: gcloud
     gcloud:
       # Pushes to Google Container Registry.
-      project: # TODO: GCloud Project Name
+      project: learning-2-learn-221016
       # Make a service account with GCR push permissions, put it in secrets/gcr-key.json
       service_key: gcr-key.json
-    aws:
-      # Pushes to Amazon ECR
-      project: # TODO: AWS project id
-      zone: # TODO: Zone in which your container image should live. Match your cluster's zone
-      # TODO: Get AWS credentials that can push to ECR, in same format as ~/.aws/credentials
-      # then put them in secrets/aws-config.txt
-      service_key: aws-config.txt
 
 cluster:
   provider: # TODO: gcloud or aws
