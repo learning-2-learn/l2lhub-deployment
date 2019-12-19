@@ -35,7 +35,7 @@ jobs:
         name: Setup Helm
         with:
           entrypoint: /bin/bash
-          args: -c "helm init --client-only && helm repo add jupyterhub https://jupyterhub.github.io/helm-chart/ && helm repo update"
+          args: -c "curl https://get.helm.sh/helm-v3.0.2-linux-amd64.tar.gz | tar -xvzf - && mv linux-amd64/helm /usr/local/bin && helm repo add jupyterhub https://jupyterhub.github.io/helm-chart/ && helm repo update"
       - uses: docker://yuvipanda/hubploy:dev
         name: Deploy to staging
         if: github.ref == 'refs/heads/staging'
