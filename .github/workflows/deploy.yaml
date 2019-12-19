@@ -32,16 +32,22 @@ jobs:
         with:
           args: build audio-eye --check-registry --push
       - uses: docker://yuvipanda/hubploy:201912192040117e1ece
+        env:
+          PATH: $HOME/linux-amd64/:$PATH
         name: Setup Helm
         with:
           entrypoint: /bin/bash
-          args: -c "curl https://get.helm.sh/helm-v3.0.2-linux-amd64.tar.gz | tar -xvzf - && mv linux-amd64/helm /usr/local/bin && helm repo add jupyterhub https://jupyterhub.github.io/helm-chart/ && helm repo update"
+          args: -c "curl https://get.helm.sh/helm-v3.0.2-linux-amd64.tar.gz | tar -xvzf - && helm repo add jupyterhub https://jupyterhub.github.io/helm-chart/ && helm repo update"
       - uses: docker://yuvipanda/hubploy:201912192040117e1ece
+        env:
+          PATH: $HOME/linux-amd64/:$PATH
         name: Deploy to staging
         if: github.ref == 'refs/heads/staging'
         with:
           args: deploy l2lhub hub staging
       - uses: docker://yuvipanda/hubploy:201912192040117e1ece
+        env:
+          PATH: $HOME/linux-amd64/:$PATH
         name: Deploy to prod
         if: github.ref == 'refs/heads/prod'
         with:
