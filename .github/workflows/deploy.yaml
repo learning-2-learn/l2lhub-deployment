@@ -33,8 +33,7 @@ jobs:
           args: build audio-eye --check-registry --push
       - name: Set path for helm 3 in subsequent steps
         run: |
-            echo "::add-path::$GITHUB_WORKSPACE/linux-amd64"
-            echo $PATH
+            echo "::add-path::linux-amd64"
       - uses: docker://yuvipanda/hubploy:201912192040117e1ece
         name: Setup Helm
         with:
