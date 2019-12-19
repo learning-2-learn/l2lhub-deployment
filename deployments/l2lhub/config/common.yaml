@@ -1,5 +1,19 @@
 jupyterhub:
-  singleuser:
-    memory:
-      guarantee: 512M
-      limit: 1G
+    singleuser:
+      defaultUrl: "/lab"
+      image:
+        name: gcr.io/learning-2-learn-221016/l2lhub-user-image
+      cloudMetadata:
+        enabled: true
+      cpu:
+        limit: 4
+        guarantee: 1
+      memory:
+        limit: 22G
+        guarantee: 22G
+
+    cull:
+      enabled: true
+      users: false
+      timeout: 1800
+      every: 600
