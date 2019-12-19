@@ -9,16 +9,10 @@ images:
       service_key: gcr-key.json
 
 cluster:
-  provider: # TODO: gcloud or aws
+  provider: gcloud
   gcloud:
-    project: # TODO: Name of your Google Cloud project with the cluster in it
-    cluster: # TODO: Name of your Kubernetes cluster
-    zone: # TODO: Zone or region your cluster is in
-    # Make a service key with permissions to talk to your cluster, put it in secrets/gkee-key.json
+    project: learning-2-learn-221016
+    cluster: l2l-jhub-2019-12-19
+    zone: us-central1
+    # Make a service key with permissions to talk to your cluster, put it in secrets/gke-key.json
     service_key: gke-key.json
-  aws:
-      project: # TODO: AWS project id
-      zone: # TODO: Zone in which your container image should live. Match your cluster's zone
-      # TODO: Get AWS credentials that can access your EKS cluster, in same format as ~/.aws/credentials
-      # then put them in secrets/aws-eks-config.txt
-      service_key: aws-eks-config.txt
