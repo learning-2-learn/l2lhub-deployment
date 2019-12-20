@@ -1,4 +1,10 @@
 dask-gateway:
+    webProxy:
+      service:
+        type: ClusterIP
+    schedulerProxy:
+      service:
+        type: ClusterIP
     gateway:
       clusterManager:
         clusterStartTimeout: 600
