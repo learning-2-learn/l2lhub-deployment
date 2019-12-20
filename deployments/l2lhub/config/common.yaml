@@ -17,10 +17,10 @@ dask-gateway:
                 value: "user"
         scheduler:
           extraPodConfig:
-          tolerations:
-            - key: "hub.jupyter.org_dedicated"
-              operator: "Equal"
-              value: "user"
+            tolerations:
+              - key: "hub.jupyter.org_dedicated"
+                operator: "Equal"
+                value: "user"
       extraConfig: |
               from dask_gateway_server.options import Options, Integer, Float, String
               def option_handler(options):
