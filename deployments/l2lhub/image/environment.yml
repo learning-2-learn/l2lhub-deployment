@@ -1,4 +1,4 @@
-name: pangeo
+name: l2lhub
 channels:
   - conda-forge
 dependencies:
