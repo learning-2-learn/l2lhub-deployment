@@ -1,3 +1,39 @@
+dask-gateway:
+    gateway:
+      clusterManager:
+        clusterStartTimeout: 600
+        workerStartTimeout: 600
+        worker:
+          extraPodConfig:
+            tolerations:
+              - key: "hub.jupyter.org_dedicated"
+                operator: "Equal"
+                value: "user"
+        scheduler:
+          extraPodConfig:
+          tolerations:
+            - key: "hub.jupyter.org_dedicated"
+              operator: "Equal"
+              value: "user"
+      extraConfig: |
+              from dask_gateway_server.options import Options, Integer, Float, String
+              def option_handler(options):
+                  if ":" not in options.image:
+                      raise ValueError("When specifying an image you must also provide a tag")
+                  return {
+                      "worker_cores_limit": options.worker_cores,
+                      "worker_cores": min(options.worker_cores / 2, 1),
+                      "worker_memory": "%fG" % options.worker_memory,
+                      "image": options.image,
+                  }
+              c.DaskGateway.cluster_manager_options = Options(
+                  Integer("worker_cores", 4, min=1, max=4, label="Worker Cores"),
+                  Float("worker_memory", 22, min=1, max=22, label="Worker Memory (GiB)"),
+                  String("image", default="", label="Image"),
+                  handler=option_handler,
+              )
+              c.DaskGateway.stop_clusters_on_shutdown = True
+
 jupyterhub:
     singleuser:
       defaultUrl: "/lab"
