@@ -30,7 +30,7 @@ jobs:
       - uses: docker://yuvipanda/hubploy:dev
         name: build & push image if needed
         with:
-          args: build audio-eye --check-registry --push
+          args: build l2lhub --check-registry --push
       - uses: docker://yuvipanda/hubploy:dev
         name: Setup Helm
         with:
