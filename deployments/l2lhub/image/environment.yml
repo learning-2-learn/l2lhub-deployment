@@ -5,7 +5,7 @@ dependencies:
   - h5py==2.9.0
   - matplotlib==3.1.0
   - nitime==0.7
-  - xarray==0.12.1
+  - xarray==0.14.1
   - numba==0.43.1
   - scikit-image==0.15.0
   - gcsfs==0.4.0
