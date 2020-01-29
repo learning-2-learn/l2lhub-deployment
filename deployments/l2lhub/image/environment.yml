@@ -24,6 +24,7 @@ dependencies:
   - mne==0.18.2
   - octave_kernel
   - pip
+  - line_profiler
   - pip:
     - julia
     - fooof==0.1.3
