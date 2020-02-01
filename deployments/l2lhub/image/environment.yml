@@ -31,3 +31,4 @@ dependencies:
     - neurodsp==1.1.2
     - bycycle==0.1.2
     - pactools
+    - fooof
