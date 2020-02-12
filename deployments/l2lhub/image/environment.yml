@@ -22,6 +22,7 @@ dependencies:
   - intake==0.5.1
   - prefect==0.6.3
   - mne==0.18.2
+  - tensortools==0.3
   - octave_kernel
   - pip
   - line_profiler
