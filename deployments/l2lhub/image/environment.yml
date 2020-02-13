@@ -32,4 +32,4 @@ dependencies:
     - bycycle==0.1.2
     - pactools
     - nwbwidgets
-    - tensortools
+    - git+https://github.com/ahwillia/tensortools@v0.3.0
