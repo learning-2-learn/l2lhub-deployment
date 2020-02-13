@@ -25,6 +25,7 @@ dependencies:
   - octave_kernel
   - pip
   - line_profiler
+  - cython
   - pip:
     - julia
     - fooof==0.1.3
