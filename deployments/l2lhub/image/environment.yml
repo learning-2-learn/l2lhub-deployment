@@ -32,4 +32,3 @@ dependencies:
     - bycycle==0.1.2
     - pactools
     - nwbwidgets
-    - tensortools==0.3
