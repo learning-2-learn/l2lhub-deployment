@@ -25,6 +25,7 @@ dependencies:
   - octave_kernel
   - pip
   - line_profiler
+  - cython
   - pip:
     - julia
     - fooof==0.1.3
@@ -32,3 +33,4 @@ dependencies:
     - bycycle==0.1.2
     - pactools
     - nwbwidgets
+    - git+https://github.com/ahwillia/tensortools@v0.3.0
