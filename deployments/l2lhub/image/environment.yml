@@ -28,7 +28,7 @@ dependencies:
   - pip:
     - julia
     - fooof==0.1.3
-    - neurodsp==1.1.2
+    - neurodsp==2.0.0
     - bycycle==0.1.2
     - pactools
     - nwbwidgets
