@@ -2,7 +2,7 @@ name: l2lhub
 channels:
   - conda-forge
 dependencies:
-  - h5py==2.9.0
+  - hdf5>=1.10.5
   - matplotlib==3.1.0
   - nitime==0.7
   - xarray==0.14.1
