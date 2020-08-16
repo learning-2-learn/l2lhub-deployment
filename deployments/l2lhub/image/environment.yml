@@ -17,7 +17,7 @@ dependencies:
   - hvplot==0.4.0
   - panel==0.5.1
   - tqdm==4.32.1
-  - plotly==3.9.0
+  - plotly==4.9.0
   - ipywidgets==7.4.2
   - intake==0.5.1
   - prefect==0.6.3
@@ -26,6 +26,7 @@ dependencies:
   - pip
   - line_profiler
   - cython
+  - google-cloud-sdk
   - pip:
     - julia
     - fooof==0.1.3
