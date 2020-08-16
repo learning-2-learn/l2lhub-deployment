@@ -26,6 +26,7 @@ dependencies:
   - pip
   - line_profiler
   - cython
+  - google-cloud-sdk
   - pip:
     - julia
     - fooof==0.1.3
