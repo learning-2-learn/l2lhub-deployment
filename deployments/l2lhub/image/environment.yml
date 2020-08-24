@@ -28,6 +28,7 @@ dependencies:
   - cython
   - google-cloud-sdk
   - pip:
+    - dpca
     - julia
     - fooof==0.1.3
     - git+https://github.com/neurodsp-tools/neurodsp@ed82caa2d93606d1500de0997dce962b81bc69eb
