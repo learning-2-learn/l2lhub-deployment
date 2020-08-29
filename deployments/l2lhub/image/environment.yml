@@ -27,7 +27,7 @@ dependencies:
   - line_profiler
   - cython
   - google-cloud-sdk
-  - bqplot
+  - bqplot=0.12.14
   - pip:
     - dpca
     - julia

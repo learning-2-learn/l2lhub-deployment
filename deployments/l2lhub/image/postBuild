@@ -1,5 +1,6 @@
 jupyter labextension install @pyviz/jupyterlab_pyviz
 jupyter labextension install @lckr/jupyterlab_variableinspector
+jupyter labextension install @jupyter-widgets/jupyterlab-manager
 jupyter labextension install bqplot
 
 HDF5_DIR=$NB_PYTHON_PREFIX pip install --no-binary=h5py git+https://github.com/h5py/h5py.git
