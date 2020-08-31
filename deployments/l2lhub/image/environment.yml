@@ -12,14 +12,14 @@ dependencies:
   - oct2py==5.0.2
   - zarr==2.3.1
   - seaborn==0.9.0
-  - holoviews==1.12.3
+  - holoviews
   - datashader==0.7.0
-  - hvplot==0.4.0
-  - panel==0.5.1
+  - hvplot
+  - panel
   - tqdm==4.32.1
   - plotly==4.9.0
-  - ipywidgets==7.4.2
-  - intake==0.5.1
+  - ipywidgets
+  - intake
   - prefect==0.6.3
   - mne==0.18.2
   - octave_kernel
@@ -27,6 +27,7 @@ dependencies:
   - line_profiler
   - cython
   - google-cloud-sdk
+  - bqplot=0.12.16
   - pip:
     - dpca
     - julia
