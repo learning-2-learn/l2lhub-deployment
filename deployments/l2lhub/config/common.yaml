@@ -51,8 +51,8 @@ jupyterhub:
         limit: 4
         guarantee: 1
       memory:
-        limit: 32G
-        guarantee: 32G
+        limit: 22G
+        guarantee: 22G
 
     cull:
       enabled: true
