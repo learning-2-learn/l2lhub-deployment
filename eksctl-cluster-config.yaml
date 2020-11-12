@@ -1,0 +1,47 @@
+# This eksctl configuration file represents the cluster
+# ref:      https://eksctl.io/usage/schema/
+# create:   eksctl create cluster --config-file eksctl-cluster-config.yaml
+# upgrade:  eksctl upgrade cluster --config-file eksctl-cluster-config.yaml
+# delete:   eksctl delete cluster --config-file eksctl-cluster-config.yaml
+#
+# Attribution: this was based on @yuvipanda's work in 2i2c! <3
+# ref: https://github.com/2i2c-org/pangeo-hubs/blob/8e552bc198d8339efe8c003cb847849255e8f8ed/aws/eksctl-config.yaml
+#
+apiVersion: eksctl.io/v1alpha5
+kind: ClusterConfig
+metadata:
+  name: l2l
+  # region was chosen to to us-west-2 (Oregon) over us-east-2 (Ohio) which was
+  # another reasonable option for the sake of data locality, see what to
+  # consider in this great guide: https://www.concurrencylabs.com/blog/choose-your-aws-region-wisely/
+  region: us-west-2
+  version: "1.18"
+
+# availabilityZones: for the EKS control plane, arbitrary chosen but made
+# explicit to ensure we can locate the node pool on an AZ where the EKS control
+# plane exist as required.
+availabilityZones: [us-west-2d, us-west-2b, us-west-2a]
+
+# When choosing machine type, consider:
+# - Maximum pods: https://github.com/awslabs/amazon-eks-ami/blob/master/files/eni-max-pods.txt
+# - Node specs:   https://aws.amazon.com/ec2/instance-types/
+nodeGroups:
+  # Core node group to hold non-user content
+  - name: core
+    instanceType: m5.xlarge   # 28 pods, 2 cpu, 8 GB
+    minSize: 1
+    maxSize: 2
+    desiredCapacity: 1
+    volumeSize: 80
+    labels:
+      hub.jupyter.org_node-purpose: core
+    tags:
+      k8s.io/cluster-autoscaler/node-template/label/hub.jupyter.org_node-purpose: core
+    # availabilityZones: aws ec2 describe-availability-zones --region <region-name>
+    availabilityZones: [us-west-2d]
+    iam:
+      withAddonPolicies:
+        # autoscaler: enables IAM policy for cluster-autoscaler
+        autoScaler: true
+        # ebs: enables the new EBS CSI (Elastic Block Store Container Storage Interface) driver
+        ebs: true
