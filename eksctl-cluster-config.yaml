@@ -25,18 +25,27 @@ availabilityZones: [us-west-2d, us-west-2b, us-west-2a]
 # When choosing machine type, consider:
 # - Maximum pods: https://github.com/awslabs/amazon-eks-ami/blob/master/files/eni-max-pods.txt
 # - Node specs:   https://aws.amazon.com/ec2/instance-types/
-nodeGroups:
+#
+# To upgrade (requires managedNodeGroups rather than nodeGroups):
+# - eksctl upgrade nodegroup --config-file eksctl-cluster-config.yaml
+managedNodeGroups:
   # Core node group to hold non-user content
   - name: core
-    instanceType: m5.xlarge   # 28 pods, 2 cpu, 8 GB
+    instanceType: m5.large   # 28 pods, 2 cpu, 8 GB
     minSize: 1
     maxSize: 2
     desiredCapacity: 1
     volumeSize: 80
     labels:
-      hub.jupyter.org_node-purpose: core
+      hub.jupyter.org/node-purpose: core
+    # tags: we need to help the cluster autoscaler a bit to know what labels the
+    #       nodes created from a node group will get, besides knowing if a k8s
+    #       cluster can use a node group.
+    # ref: https://github.com/kubernetes/autoscaler/blob/master/cluster-autoscaler/cloudprovider/aws/README.md#auto-discovery-setup
     tags:
-      k8s.io/cluster-autoscaler/node-template/label/hub.jupyter.org_node-purpose: core
+      # automaticly added by eksctl: k8s.io/cluster-autoscaler/<cluster-name>
+      # automaticly added by eksctl: k8s.io/cluster-autoscaler/enabled
+      k8s.io/cluster-autoscaler/node-template/label/hub.jupyter.org/node-purpose: core
     # availabilityZones: aws ec2 describe-availability-zones --region <region-name>
     availabilityZones: [us-west-2d]
     iam:
