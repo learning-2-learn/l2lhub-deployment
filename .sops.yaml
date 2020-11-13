@@ -1,0 +1,38 @@
+# This is a configuration file for mozilla/sops, a CLI for encrypting/decrypting
+# content. See https://github.com/mozilla/sops.
+
+# This is a file that configures SOPS to assume it should use a specific keyring
+# and key if encrypting a new file. If it is to decrypt an existing file, that
+# information will be available as metadata and this is not needed.
+#
+# To authenticate yourself sufficiently:
+#
+#   GCP:
+#     gcloud auth login
+#     gcloud auth application-default login
+#
+#   AWS:
+#     ???
+#
+# To setup a new keyring and key:
+#
+#   GCP:
+#     gcloud kms keyrings create l2l --location global
+#     gcloud kms keyrings list --location global
+#     gcloud kms keys create main --location global --keyring l2l --purpose encryption
+#     gcloud kms keys list --location global --keyring l2l
+#
+#   AWS:
+#     ???
+#
+# To encrypt a new file:
+#
+#   sops --encrypt --in-place deployments/l2l/secrets/common.yaml
+#
+# To edit an encrypted file:
+#
+#   sops deployments/l2l/secrets/common.yaml
+#
+creation_rules:
+  # - gcp_kms: projects/neurohackademy/locations/global/keyRings/nh-2020/cryptoKeys/main
+  - kms: 'arn:aws:kms:us-west-2:927034868273:key/fe86dd69-4132-404c-ab86-4269956b4500,arn:aws:kms:us-west-2:361527076523:key/5052f06a-5d3f-489e-b86c-57201e06f31e+arn:aws:iam::361527076523:role/hiera-sops-prod'

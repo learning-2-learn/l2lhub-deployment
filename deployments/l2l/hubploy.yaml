@@ -1,0 +1,21 @@
+
+
+images:
+  image_name: FIXME
+  registry:
+    provider: aws
+    aws:
+      # service_key: AWS credentials for a ECR image registry. Format them like
+      # ~/.aws/credentials and put in to the file secrets/<service_key>.
+      service_key: aws-ecr-config.cfg
+      account_id: 423786577274
+
+cluster:
+  provider: aws
+  aws:
+    cluster: l2l
+    region: us-east-2
+    # service_key: AWS credentials for a EKS cluster. Format them like
+    # ~/.aws/credentials and put in to the file secrets/<service_key>.
+    service_key: aws-eks-config.cfg
+    account_id: 423786577274
