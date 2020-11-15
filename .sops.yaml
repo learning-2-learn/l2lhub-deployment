@@ -12,7 +12,7 @@
 #     gcloud auth application-default login
 #
 #   AWS:
-#     ???
+#     See infra/cloudformation-sops.yaml comments
 #
 # To setup a new keyring and key:
 #
@@ -23,7 +23,7 @@
 #     gcloud kms keys list --location global --keyring l2l
 #
 #   AWS:
-#     ???
+#     See infra/cloudformation-sops.yaml comments
 #
 # To encrypt a new file:
 #
@@ -35,4 +35,4 @@
 #
 creation_rules:
   # - gcp_kms: projects/neurohackademy/locations/global/keyRings/nh-2020/cryptoKeys/main
-  - kms: 'arn:aws:kms:us-west-2:927034868273:key/fe86dd69-4132-404c-ab86-4269956b4500,arn:aws:kms:us-west-2:361527076523:key/5052f06a-5d3f-489e-b86c-57201e06f31e+arn:aws:iam::361527076523:role/hiera-sops-prod'
+  - kms: arn:aws:kms:us-west-2:423786577274:key/80fbf43c-a522-4625-ac6d-e6482ddb97e4

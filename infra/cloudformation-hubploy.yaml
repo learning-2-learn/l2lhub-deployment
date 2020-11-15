@@ -1,0 +1,198 @@
+# Cloudformation is like Terraform but specific to AWS, in other words, it allow
+# you to declare some cloud infrastructure in configuration files which you can
+# then request be setup on AWS by a CLI (aws cloudformation deploy). A quick
+# intro is available here: https://www.youtube.com/watch?v=Omppm_YUG2g
+#
+# This cloudformation configuration contain what we need to complement the
+# eksctl created k8s cluster for hubploy to run in our CI system.
+
+# Goals:
+#
+#   1. For us maintainers to be able to encrypt/decrypt secret content with
+#      mozilla/sops directly, but also let hubploy use mozilla/sops to decrypt
+#      them using a AWS service account. This will require AWS KMS to be setup.
+#   2. To enable hubploy to build and push docker images to our default AWS
+#      container registry (<aws_account_id>.dkr.ecr.<region>.amazonaws.com).
+#
+# Required AWS infrastructure to create:
+#
+#   1. A dedicated service account (AWS::IAM::User), with an associated
+#      AccessKey (AWS::IAM::AccessKey).
+#   2. A KMS service (AWS::KMS::Key), and permissions to use it to the dedicated
+#      service account.
+#   3. Permissions for the dedicated service account to push to the default
+#      container registry.
+#   4. Permissions for the dedicated service account to work against the k8s
+#      cluster created by eksctl, which use cloudformation under the hood.
+#
+
+# Operations:
+#
+# Update:
+#   aws cloudformation deploy --stack-name=l2l-hubploy --template-file=./cloudformation-hubploy.yaml --capabilities=CAPABILITY_NAMED_IAM
+#
+# Inspect:
+#   aws cloudformation describe-stacks --stack-name=l2l-hubploy
+#
+# Delete:
+#   aws cloudformation delete-stack --stack-name=l2l-hubploy
+#
+
+# References:
+#
+# AWS Cloudformation console:
+#   https://console.aws.amazon.com/cloudformation/home
+#
+# AWS Cloudformation intro:
+#   https://www.youtube.com/watch?v=Omppm_YUG2g
+#
+# AWS IAM intro:
+#   https://www.youtube.com/watch?v=3A5hRIT8zdo
+#
+# The starting point for me:
+#   https://medium.com/mercos-engineering/secrets-as-a-code-with-mozilla-sops-and-aws-kms-d069c45ae1b9
+#
+# Reference on !Join:
+#   https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/intrinsic-function-reference-join.html
+#
+
+# The resources we want to be created in the "stack" named l2l-hubploy
+Resources:
+  # ref: https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-iam-user.html
+  IamUser:
+    Type: AWS::IAM::User
+    Properties:
+      UserName: hubploy
+
+  # ref: https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-iam-accesskey.html
+  IamAccessKey:
+    Type: AWS::IAM::AccessKey
+    Properties:
+      UserName: !Ref IamUser
+
+  # ref: https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-iam-role.html
+  IamRoleEcr:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: hubploy-ecr
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement: 
+          - Sid: AllowRoleToBeAssumedByOurUser
+            Effect: Allow
+            Principal:
+              AWS: !Join
+                - ''
+                - - 'arn:aws:iam::'
+                  - !Ref AWS::AccountId
+                  - :user/
+                  - !Ref IamUser
+            Action: 
+              - sts:AssumeRole
+  IamRoleEks:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: hubploy-eks
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement: 
+          - Sid: AllowRoleToBeAssumedByOurUser
+            Effect: Allow
+            Principal:
+              AWS: !Join
+                - ''
+                - - 'arn:aws:iam::'
+                  - !Ref AWS::AccountId
+                  - :user/
+                  - !Ref IamUser
+            Action: 
+              - sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonEKSServicePolicy
+  
+  # ref: https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-ecr-repository.html
+  EcrRepository:
+    Type: AWS::ECR::Repository
+    Properties: 
+      RepositoryName: l2l
+      RepositoryPolicyText:
+        Version: 2008-10-17
+        Statement:
+          - Sid: Allow push and pull for our specific user
+            Effect: Allow
+            Principal:
+              AWS: !Join
+                - ''
+                - - 'arn:aws:iam::'
+                  - !Ref AWS::AccountId
+                  - :role/
+                  - !Ref IamRoleEcr
+            Action:
+              - ecr:GetDownloadUrlForLayer
+              - ecr:BatchGetImage
+              - ecr:BatchCheckLayerAvailability
+              - ecr:PutImage
+              - ecr:InitiateLayerUpload
+              - ecr:UploadLayerPart
+              - ecr:CompleteLayerUpload         
+          - Sid: Allow pull for who are authenticated with our account
+            Effect: Allow
+            Principal:
+              AWS: !Ref AWS::AccountId
+            Action:
+              - ecr:GetDownloadUrlForLayer
+              - ecr:BatchGetImage
+
+  # ref: https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-kms-key.html
+  KmsKey:
+    Type: AWS::KMS::Key
+    Properties:
+      Description: Enables mozilla/sops to encrypt/decrypt secrets just in time.
+      KeyPolicy:
+        Version: 2012-10-17
+        Statement:
+          - Sid: Enable Root IAM User Permissions
+            Effect: Allow
+            Principal:
+              AWS: !Join
+                - ''
+                - - 'arn:aws:iam::'
+                  - !Ref AWS::AccountId
+                  - :root
+            Action: 'kms:*'
+            Resource: '*'
+          - Sid: Enable User Permissions
+            Effect: Allow
+            Principal:
+              AWS: !Join
+                - ''
+                - - 'arn:aws:iam::'
+                  - !Ref AWS::AccountId
+                  - :user/
+                  - !Ref IamUser
+            Action:
+              - "kms:DescribeKey"
+              - "kms:Encrypt"
+              - "kms:Decrypt"
+              - "kms:ReEncrypt*"
+              - "kms:GenerateDataKey"
+              - "kms:GenerateDataKeyWithoutPlaintext"
+            Resource: '*'
+
+# The relevant information from the created resources.
+Outputs:
+  KmsKeyArn:
+    Value: !GetAtt KmsKey.Arn
+    Description: Use this to set creation_rules[0].kms in .sops.yaml
+  AwsAccessKeyId:
+    Value: !Ref IamAccessKey
+    Description: Use this to set AWS_ACCESS_KEY_ID
+  AwsSecretAccessKey:
+    Value: !GetAtt IamAccessKey.SecretAccessKey
+    Description: Use this to set AWS_SECRET_ACCESS_KEY
+  AwsDefaultRegion:
+    Value: !Ref AWS::Region
+    Description: Use this to set AWS_DEFAULT_REGION
+  AwsSdkLoadConfig:
+    Value: "false"
+    Description: Use this to set AWS_SDK_LOAD_CONFIG
