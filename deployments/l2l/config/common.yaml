@@ -1,4 +1,11 @@
 jupyterhub:
+  auth:
+    type: github
+    github:
+      # clientId is set in secrets folder
+      # clientSecret is set in secrets folder
+      callbackUrl: https://l2l.sundellopensource.com/hub/oauth_callback
+
   debug:
     enabled: true
 
@@ -200,8 +207,8 @@ jupyterhub:
 
   proxy:
     https:
-      # enabled: true
-      # hosts: [hub.l2l.org]
+      enabled: true
+      hosts: [l2l.sundellopensource.com]
     service:
       type: LoadBalancer
       # loadBalancerIP: ?
@@ -222,12 +229,15 @@ jupyterhub:
 # https://github.com/helm/charts/blob/master/stable/grafana/values.yaml
 grafana:
   # Reference on Grafana's configuration options:
-  # http://docs.grafana.org/installation/configuration
+  # https://grafana.com/docs/grafana/latest/administration/configuration/
   grafana.ini:
     log:
       level: debug
+    security:
+      cookie_secure: true
+      # secret_key is set in secrets folder
     server:
-      domain: hub.l2l.org
+      domain: l2l.sundellopensource.com
       # NOTE: Don't use %(protocol)s in root_url, but hardcode https. If not, it
       #       will when redirecting the user to external authentication set with
       #       a redirect back query parameter to use http instead of https,

@@ -24,6 +24,8 @@ dependencies:
   - name: dask-gateway
     version: 0.9.0
     repository: https://dask.org/dask-gateway-helm-repo/
+    tags:
+      - dask-gateway
 
   # Prometheus for collection of metrics.
   # https://github.com/prometheus-community/helm-charts/tree/main/charts/prometheus

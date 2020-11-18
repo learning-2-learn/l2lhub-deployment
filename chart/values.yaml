@@ -4,7 +4,11 @@ tags:
   # available. Its also worth noting that access to Grafana relies on
   # JupyterHub's configurable proxy in this setup, so JupyterHub needs to run to
   # be able to access Grafana.
-  metrics: true
+  metrics: false
+  dask-gateway: false
+
+nfs:
+  enabled: false
 
 jupyterhub:
   hub:
@@ -67,6 +71,7 @@ dask-gateway:
 # https://github.com/helm/charts/blob/master/stable/grafana/values.yaml
 grafana:
   fullnameOverride: grafana
+  adminUser: admin
 
   # NOTE: It can be useful to be able to render an image of a chart, but that
   #       requires a workaround configuration of the Grafana Helm chart at the

@@ -10,12 +10,12 @@ images:
     provider: aws
     aws:
       project: 423786577274   # AWS Account
-      role_arn: hubploy-ecr
+      role_arn: arn:aws:iam::423786577274:role/hubploy-ecr
 
 cluster:
   provider: aws
   aws:
     project: 423786577274     # AWS Account
-    role_arn: hubploy-eks
+    role_arn: arn:aws:iam::423786577274:role/hubploy-eks
     cluster: l2l
     zone: us-west-2
