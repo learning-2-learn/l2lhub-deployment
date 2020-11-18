@@ -5,6 +5,7 @@ on:
   push:
     paths: ["chart/**", "deployments/**"]
     branches: ["aws-2020"]
+  workflow_dispatch:
 
 # This job:
 # - Installs the CLIs: aws, sops, and hubploy
