@@ -1,59 +1,67 @@
-name: deploy-gke
+name: deploy-aws
 
-# Only run this when the master branch's chart/deployments folder changes
+# Only run this when the chosen branch's chart/deployments folder changes
 on:
   push:
-    paths:
-    - chart/**
-    - deployments/**
-    branches:
-    - aws-2020
+    paths: ["chart/**", "deployments/**"]
+    branches: ["aws-2020"]
 
 # This job:
-# - installs gcloud and configures it to use a GCP SA allowed to decrypt
-#   encrypted GCR / GKE credentials
-# - installs sops and hubploy
-# - use hubploy to build an image and deploys the Helm chart to GKE
-# - annotates a grafana dashboard that a deployment starts
+# - Installs the CLIs: aws, sops, and hubploy
+# - Relies on GitHub secrets AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY for
+#   access to a AWS account created with infra/cloudformation-hubploy.yaml
+# - Use hubploy to build an image with repo2docker
+# - Use hubploy to deploy the Helm chart in ./chart to EKS
+# - Annotates a Grafana dashboard that a deployment started
 jobs:
   deploy-aws:
-    # Available runners: https://help.github.com/en/actions/reference/virtual-environments-for-github-hosted-runners
-    # Ubuntu 18.04 documentation: https://github.com/actions/virtual-environments/blob/master/images/linux/Ubuntu1804-README.md
+    name: Deploy Helm chart
     runs-on: ubuntu-20.04
     steps:
     - uses: actions/checkout@v2
       with:
-        # Required for hubploy's inspection of git history
+        # Required for hubploy's use of chartpress that inspects git history
         fetch-depth: 0
-    - uses: actions/setup-python@v1
+    - uses: actions/setup-python@v2
       with:
-        python-version: 3.7
-    - name: Install SOPS
+        python-version: 3.8
+    - name: Install aws, sops, and hubploy CLIs
       run: |
+        # sops
         curl -sSL https://github.com/mozilla/sops/releases/download/v3.6.1/sops_3.6.1_amd64.deb -o /tmp/sops.deb
         sudo apt-get install /tmp/sops.deb
-    - name: Install hubploy
-      run: |
+
+        # aws
+        curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+        unzip awscliv2.zip
+        sudo ./aws/install
+
+        # hubploy
         pip install https://github.com/yuvipanda/hubploy/archive/master.zip
+
     - name: "hubploy: build"
+      id: hubploy_build
+      env:
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
       run: |
         hubploy build l2l --push
-    ## GitHub Actions doesn't yet provide a simple way to allow-failure of a
-    ## step, so this should be commented in when grafana is up and running after
-    ## an initial deployment.
-    ##
-    ## ref: https://github.com/actions/toolkit/issues/399
-    ##
-    # - name: Create a global Grafana dashboard annotation
-    #   uses: frankie567/grafana-annotation-action@v1.0.2
-    #   with:
-    #     apiHost: https://hub.neurohackademy.org/services/grafana
-    #     apiToken: ${{ secrets.GRAFANA_API_TOKEN }}
-    #     text: |
-    #       Deployment triggered by ${{ github.actor }}.
-    #       - <a href="${{ github.event.repository.html_url }}/actions/runs/${{ github.run_id }}">Inspect CI run</a>
-    #       - <a href="${{ github.event.repository.html_url }}/compare/${{ github.event.before }}..${{ github.event.after }}">Compare commits</a>
-    #     tags: deployment,github
+
+    - name: Push a Grafana dashboard annotation
+      uses: frankie567/grafana-annotation-action@v1.0.3
+      continue-on-error: true
+      with:
+        apiHost: https://l2l.sundellopensource.com/services/grafana
+        apiToken: ${{ secrets.GRAFANA_API_TOKEN }}
+        text: |
+          Deployment triggered by ${{ github.actor }}.
+          - <a href="${{ github.event.repository.html_url }}/actions/runs/${{ github.run_id }}">Inspect CI run</a>
+          - <a href="${{ github.event.repository.html_url }}/compare/${{ github.event.before }}..${{ github.event.after }}">Compare commits</a>
+        tags: deployment,github
+
     - name: "hubploy: deploy"
+      env:
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
       run: |
         hubploy deploy --namespace default --cleanup-on-fail l2l ./chart prod
