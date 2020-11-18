@@ -3,7 +3,7 @@ name: deploy-aws
 # Only run this when the chosen branch's chart/deployments folder changes
 on:
   push:
-    paths: ["chart/**", "deployments/**"]
+    paths: ["chart/**", "deployments/**", ".github/workflows/deploy-aws.yaml"]
     branches: ["aws-2020"]
   workflow_dispatch:
 
