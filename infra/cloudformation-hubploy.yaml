@@ -93,6 +93,15 @@ Resources:
     Type: AWS::IAM::Role
     Properties:
       RoleName: hubploy-eks
+      Policies:
+        - PolicyName: EksAccess
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - eks:DescribeCluster
+                Resource: !Sub arn:aws:eks:${AWS::Region}:${AWS::AccountId}:cluster/l2l
       AssumeRolePolicyDocument:
         Version: 2012-10-17
         Statement: 
@@ -107,8 +116,6 @@ Resources:
                   - !Ref IamUser
             Action: 
               - sts:AssumeRole
-      ManagedPolicyArns:
-        - arn:aws:iam::aws:policy/AmazonEKSServicePolicy
   
   # ref: https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-ecr-repository.html
   EcrRepository:
@@ -184,6 +191,12 @@ Outputs:
   KmsKeyArn:
     Value: !GetAtt KmsKey.Arn
     Description: Use this to set creation_rules[0].kms in .sops.yaml
+  IamRoleEcrArn:
+    Value: !GetAtt IamRoleEcr.Arn
+    Description: Use this to set images[0].registry.aws.role_arn in hubploy.yaml
+  IamRoleEksArn:
+    Value: !GetAtt IamRoleEks.Arn
+    Description: Use this to set clusters[0].aws.role_arn in hubploy.yaml
   AwsAccessKeyId:
     Value: !Ref IamAccessKey
     Description: Use this to set AWS_ACCESS_KEY_ID
