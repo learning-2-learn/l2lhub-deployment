@@ -49,6 +49,13 @@ jobs:
         # hubploy
         # FIXME: update to yuvipanda/hubploy later
         pip install git+https://github.com/consideratio/hubploy.git@pr/ecr-cred-refactor
+    
+    - name: Log environment details
+      run: |
+        aws --version
+        sops --version
+        helm version
+        # hubploy --version -- no such thing yet
 
     - name: "hubploy: build"
       env:
