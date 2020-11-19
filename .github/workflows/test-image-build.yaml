@@ -1,0 +1,44 @@
+# This is a GitHub workflow defining a set of jobs with a set of steps.
+# ref: https://docs.github.com/en/free-pro-team@latest/actions/reference/workflow-syntax-for-github-actions
+#
+name: Test image build
+
+# Trigger the workflow's on all PRs but only on pushed tags or commits to
+# main/master branch to avoid PRs developed in a GitHub fork's dedicated branch
+# to trigger.
+on:
+  pull_request:
+    paths: ["deployments/l2l/image/**"]
+  # workflow_dispatch let GitHub provide a button to run the workflow manually,
+  # but it only works if this workflow is defined in the default branch.
+  workflow_dispatch:
+
+defaults:
+  run:
+    # Declare bash be used by default in this workflow's "run" steps.
+    #
+    # NOTE: bash will by default run with:
+    #   --noprofile: Ignore ~/.profile etc.
+    #   --norc:      Ignore ~/.bashrc etc.
+    #   -e:          Exit directly on errors
+    #   -o pipefail: Don't mask errors from a command piped into another command
+    shell: bash
+
+jobs:
+  test_image_build:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v2
+        with:
+          python-version: "3.8"
+
+      - name: Install hubploy
+        run: |
+          pip install https://github.com/yuvipanda/hubploy/archive/master.zip
+
+      - name: Test image build
+        run: |
+          hubploy build l2l

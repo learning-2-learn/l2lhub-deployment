@@ -5,6 +5,8 @@ on:
   push:
     paths: ["chart/**", "deployments/**", ".github/workflows/deploy-aws.yaml"]
     branches: ["aws-2020"]
+  # workflow_dispatch let GitHub provide a button to run the workflow manually,
+  # but it only works if this workflow is defined in the default branch.
   workflow_dispatch:
 
 # This job:
@@ -26,16 +28,22 @@ jobs:
     - uses: actions/setup-python@v2
       with:
         python-version: 3.8
-    - name: Install aws, sops, and hubploy CLIs
+    - name: Install aws, sops, helm, and hubploy CLIs
       run: |
-        # sops
-        curl -sSL https://github.com/mozilla/sops/releases/download/v3.6.1/sops_3.6.1_amd64.deb -o /tmp/sops.deb
-        sudo apt-get install /tmp/sops.deb
-
         # aws
         curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
         unzip awscliv2.zip
         sudo ./aws/install --update
+
+        # amazon-ecr-credential-helper
+        sudo apt-get install amazon-ecr-credential-helper
+
+        # sops
+        curl -sSL https://github.com/mozilla/sops/releases/download/v3.6.1/sops_3.6.1_amd64.deb -o /tmp/sops.deb
+        sudo apt-get install /tmp/sops.deb
+
+        # helm
+        curl https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 | bash
 
         # hubploy
         pip install https://github.com/yuvipanda/hubploy/archive/master.zip
