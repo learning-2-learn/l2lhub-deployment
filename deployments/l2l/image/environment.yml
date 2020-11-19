@@ -1,4 +1,4 @@
-name: nh
+name: l2l
 channels:
   - conda-forge
   - plotly
