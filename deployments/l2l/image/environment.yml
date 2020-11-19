@@ -3,7 +3,7 @@ channels:
   - conda-forge
   - plotly
 dependencies:
-  # conda packages for NeuroHackademy
+  # conda packages
   - git-annex
   - graphviz
   - plotly
