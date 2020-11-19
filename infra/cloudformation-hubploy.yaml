@@ -121,7 +121,7 @@ Resources:
   EcrRepository:
     Type: AWS::ECR::Repository
     Properties: 
-      RepositoryName: l2l
+      RepositoryName: l2l/user-env
       RepositoryPolicyText:
         Version: 2008-10-17
         Statement:
@@ -138,10 +138,11 @@ Resources:
               - ecr:GetDownloadUrlForLayer
               - ecr:BatchGetImage
               - ecr:BatchCheckLayerAvailability
+              - ecr:DescribeImages
               - ecr:PutImage
               - ecr:InitiateLayerUpload
               - ecr:UploadLayerPart
-              - ecr:CompleteLayerUpload         
+              - ecr:CompleteLayerUpload
           - Sid: Allow pull for who are authenticated with our account
             Effect: Allow
             Principal:
@@ -188,24 +189,21 @@ Resources:
 
 # The relevant information from the created resources.
 Outputs:
-  KmsKeyArn:
-    Value: !GetAtt KmsKey.Arn
-    Description: Use this to set creation_rules[0].kms in .sops.yaml
-  IamRoleEcrArn:
-    Value: !GetAtt IamRoleEcr.Arn
-    Description: Use this to set images[0].registry.aws.role_arn in hubploy.yaml
   IamRoleEksArn:
     Value: !GetAtt IamRoleEks.Arn
     Description: Use this to set clusters[0].aws.role_arn in hubploy.yaml
+  IamRoleEcrArn:
+    Value: !GetAtt IamRoleEcr.Arn
+    Description: Use this to set images[0].registry.aws.role_arn in hubploy.yaml
+  EcrRepository:
+    Value: !GetAtt EcrRepository.Arn
+    Description: Use this to set images[0].image_name in hubploy.yaml
+  KmsKeyArn:
+    Value: !GetAtt KmsKey.Arn
+    Description: Use this to set creation_rules[0].kms in .sops.yaml
   AwsAccessKeyId:
     Value: !Ref IamAccessKey
-    Description: Use this to set AWS_ACCESS_KEY_ID
+    Description: Use this to set AWS_ACCESS_KEY_ID as a GitHub project secret
   AwsSecretAccessKey:
     Value: !GetAtt IamAccessKey.SecretAccessKey
-    Description: Use this to set AWS_SECRET_ACCESS_KEY
-  AwsDefaultRegion:
-    Value: !Ref AWS::Region
-    Description: Use this to set AWS_DEFAULT_REGION
-  AwsSdkLoadConfig:
-    Value: "false"
-    Description: Use this to set AWS_SDK_LOAD_CONFIG
+    Description: Use this to set AWS_SECRET_ACCESS_KEY as a GitHub project secret
