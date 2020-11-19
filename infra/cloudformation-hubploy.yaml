@@ -75,6 +75,15 @@ Resources:
     Type: AWS::IAM::Role
     Properties:
       RoleName: hubploy-ecr
+      Policies:
+        - PolicyName: EcrAccess
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - ecr:*
+                Resource: "*"
       AssumeRolePolicyDocument:
         Version: 2012-10-17
         Statement: 
@@ -125,24 +134,6 @@ Resources:
       RepositoryPolicyText:
         Version: 2008-10-17
         Statement:
-          - Sid: Allow push and pull for our specific user
-            Effect: Allow
-            Principal:
-              AWS: !Join
-                - ''
-                - - 'arn:aws:iam::'
-                  - !Ref AWS::AccountId
-                  - :role/
-                  - !Ref IamRoleEcr
-            Action:
-              - ecr:GetDownloadUrlForLayer
-              - ecr:BatchGetImage
-              - ecr:BatchCheckLayerAvailability
-              - ecr:DescribeImages
-              - ecr:PutImage
-              - ecr:InitiateLayerUpload
-              - ecr:UploadLayerPart
-              - ecr:CompleteLayerUpload
           - Sid: Allow pull for who are authenticated with our account
             Effect: Allow
             Principal:
