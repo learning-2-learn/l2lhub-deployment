@@ -50,12 +50,12 @@ jobs:
         # FIXME: update to yuvipanda/hubploy later
         pip install git+https://github.com/consideratio/hubploy.git@pr/ecr-cred-refactor
 
-    # - name: "hubploy: build"
-    #   env:
-    #     AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-    #     AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-    #   run: |
-    #     hubploy build l2l --push
+    - name: "hubploy: build"
+      env:
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      run: |
+        hubploy build l2l --push
 
     - name: Push a Grafana dashboard annotation
       uses: frankie567/grafana-annotation-action@v1.0.3
@@ -74,4 +74,5 @@ jobs:
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
       run: |
+        aws sts get-caller-identity
         hubploy deploy --namespace default --cleanup-on-fail l2l ./chart prod
