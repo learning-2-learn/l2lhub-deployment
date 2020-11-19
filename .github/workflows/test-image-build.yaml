@@ -7,8 +7,10 @@ name: Test image build
 # main/master branch to avoid PRs developed in a GitHub fork's dedicated branch
 # to trigger.
 on:
+  push:
+    branches: ["aws-2020"] # FIXME: temp for debugging
   pull_request:
-    paths: ["deployments/l2l/image/**"]
+    paths: ["deployments/l2l/image/**", "**"] # FIXME: temp wildcard for debugging
   # workflow_dispatch let GitHub provide a button to run the workflow manually,
   # but it only works if this workflow is defined in the default branch.
   workflow_dispatch:

@@ -1,4 +1,5 @@
 name: deploy-aws
+# dummy trigger
 
 # Only run this when the chosen branch's chart/deployments folder changes
 on:
