@@ -46,7 +46,8 @@ jobs:
         curl https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 | bash
 
         # hubploy
-        pip install https://github.com/yuvipanda/hubploy/archive/master.zip
+        # FIXME: update to yuvipanda/hubploy later
+        pip install git+https://github.com/consideratio/hubploy.git@pr/ecr-cred-refactor
 
     - name: "hubploy: build"
       id: hubploy_build
