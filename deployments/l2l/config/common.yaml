@@ -2,202 +2,203 @@ tags:
   metrics: true
   dask-gateway: true
 
-jupyterhub:
-  auth:
-    type: github
-    github:
-      # clientId is set in secrets folder
-      # clientSecret is set in secrets folder
-      callbackUrl: https://l2l.sundellopensource.com/hub/oauth_callback
+daskhub:
+  jupyterhub:
+    auth:
+      type: github
+      github:
+        # clientId is set in secrets folder
+        # clientSecret is set in secrets folder
+        callbackUrl: https://l2l.sundellopensource.com/hub/oauth_callback
 
-  # debug:
-  #   enabled: true
+    # debug:
+    #   enabled: true
 
-  prePuller:
-    hook:
-      enabled: true
-    continuous:
-      enabled: true
+    prePuller:
+      hook:
+        enabled: true
+      continuous:
+        enabled: true
 
-  scheduling:
-    userScheduler:
-      enabled: true
-      replicas: 2
-    podPriority:
-      enabled: true
-    userPlaceholder:
-      enabled: true
-      # These replicas will use the default configured CPU and memory requests,
-      # which is overridden by c.KubeSpawner.profile_list choices by the user.
-      replicas: 0
-    corePods:
-      nodeAffinity:
-        matchNodePurpose: require
-    userPods:
-      nodeAffinity:
-        matchNodePurpose: require
+    scheduling:
+      userScheduler:
+        enabled: true
+        replicas: 2
+      podPriority:
+        enabled: true
+      userPlaceholder:
+        enabled: true
+        # These replicas will use the default configured CPU and memory requests,
+        # which is overridden by c.KubeSpawner.profile_list choices by the user.
+        replicas: 0
+      corePods:
+        nodeAffinity:
+          matchNodePurpose: require
+      userPods:
+        nodeAffinity:
+          matchNodePurpose: require
 
-  singleuser:
-    defaultUrl: /lab
-    startTimeout: 900
-    cpu:  # defaults for when profile_list is bypassed, for example by user-placeholder pods
-      guarantee: 0.5
-      limit: 16
-    memory:
-      guarantee: 6G
-      limit: 12G
-    lifecycleHooks:
-      postStart:
-        exec:
-          command:
-            - "bash"
-            - "/etc/singleuser/k8s-lifecycle-hook-post-start.sh"
-    storage:
+    singleuser:
+      defaultUrl: /lab
+      startTimeout: 900
+      cpu:  # defaults for when profile_list is bypassed, for example by user-placeholder pods
+        guarantee: 0.5
+        limit: 16
+      memory:
+        guarantee: 6G
+        limit: 12G
+      lifecycleHooks:
+        postStart:
+          exec:
+            command:
+              - "bash"
+              - "/etc/singleuser/k8s-lifecycle-hook-post-start.sh"
       storage:
-        capacity: 10Gi
-      extraVolumes:
-        ## Comment out the nh-nfs volume if nfs.enabled: false
-        # - name: nh-nfs
-        #   persistentVolumeClaim:
-        #     claimName: nfs-pvc
-        - name: user-etc-singleuser
-          configMap:
+        storage:
+          capacity: 10Gi
+        extraVolumes:
+          ## Comment out the nh-nfs volume if nfs.enabled: false
+          # - name: nh-nfs
+          #   persistentVolumeClaim:
+          #     claimName: nfs-pvc
+          - name: user-etc-singleuser
+            configMap:
+              name: user-etc-singleuser
+          - name: user-etc-profile-d
+            configMap:
+              name: user-etc-profile-d
+          - name: user-usr-local-etc-jupyter
+            configMap:
+              name: user-usr-local-etc-jupyter
+        extraVolumeMounts:
+          ## Comment out the nh-nfs volume if nfs.enabled: false
+          # - name: nh-nfs
+          #   mountPath: /nh/curriculum
+          #   subPath: curriculum
+          #   readOnly: true
+          - mountPath: /etc/singleuser
             name: user-etc-singleuser
-        - name: user-etc-profile-d
-          configMap:
+          - mountPath: /etc/profile.d/home-folder-replacements.sh
             name: user-etc-profile-d
-        - name: user-usr-local-etc-jupyter
-          configMap:
+            subPath: home-folder-replacements.sh
+          - mountPath: /usr/local/etc/jupyter
             name: user-usr-local-etc-jupyter
+
+    hub:
+      pdb:
+        enabled: false
+      extraVolumes:
+        - name: hub-etc-jupyterhub-templates
+          configMap:
+            name: hub-etc-jupyterhub-templates
+        - name: hub-usr-local-share-jupyterhub-static-external
+          configMap:
+            name: hub-usr-local-share-jupyterhub-static-external
       extraVolumeMounts:
-        ## Comment out the nh-nfs volume if nfs.enabled: false
-        # - name: nh-nfs
-        #   mountPath: /nh/curriculum
-        #   subPath: curriculum
-        #   readOnly: true
-        - mountPath: /etc/singleuser
-          name: user-etc-singleuser
-        - mountPath: /etc/profile.d/home-folder-replacements.sh
-          name: user-etc-profile-d
-          subPath: home-folder-replacements.sh
-        - mountPath: /usr/local/etc/jupyter
-          name: user-usr-local-etc-jupyter
-
-  hub:
-    pdb:
-      enabled: false
-    extraVolumes:
-      - name: hub-etc-jupyterhub-templates
-        configMap:
+        - mountPath: /etc/jupyterhub/templates
           name: hub-etc-jupyterhub-templates
-      - name: hub-usr-local-share-jupyterhub-static-external
-        configMap:
+        - mountPath: /usr/local/share/jupyterhub/static/external
           name: hub-usr-local-share-jupyterhub-static-external
-    extraVolumeMounts:
-      - mountPath: /etc/jupyterhub/templates
-        name: hub-etc-jupyterhub-templates
-      - mountPath: /usr/local/share/jupyterhub/static/external
-        name: hub-usr-local-share-jupyterhub-static-external
-    extraConfig:
-      announcements: |
-        c.JupyterHub.template_vars.update({
-            'announcement': 'Under development by Erik Sundell, please feel free to contact me on the l2l slack!',
-        })
-      performance: |
-        c.JupyterHub.concurrent_spawn_limit = 100
-      auth: |
-        # Don't wait for users to press the orange button to login.
-        c.Authenticator.auto_login = True
-      templates: |
-        # Help JupyterHub find the templates we may mount
-        c.JupyterHub.template_paths.insert(0, "/etc/jupyterhub/templates")
-      metrics: |
-        # With this setting set to False, the /hub/metrics endpoint will be
-        # publically accessible just like at hub.mybinder.org/hub/metrics is.
-        c.JupyterHub.authenticate_prometheus = False
-      workingDir: |
-        # Override the working directory of /src/repo which repo2docker have set
-        # to /home/jovyan instead, where we mount of files.
-        c.KubeSpawner.extra_container_config = {
-            "workingDir": "/home/jovyan",
-        }
-      options_form: |
-        # Configure what spawn options users should see
-        # ---------------------------------------------
-        #
-        # NOTE: setting c.KubeSpawner.profile_list directly is easier, but then
-        #       we don't have the option to adjust it based on the individual
-        #       user at a later point in time if we want.
-        #
-        # NOTE: c.KubeSpawner.options_form, defined in the Spawner base class,
-        #       can be set to a fixed value, but it can also be a callable
-        #       function that returns a value. If this returned value is falsy,
-        #       no form will be rendered. In this case, we setup a callable
-        #       function that relies on KubeSpawner's internal logic to create
-        #       an options_form from the profile_list configuration.
-        #
-        #       ref: https://github.com/jupyterhub/jupyterhub/pull/2415
-        #       ref: https://github.com/jupyterhub/jupyterhub/issues/2390
-        #
-        async def dynamic_options_form(self):
-            self.profile_list = [
-                {
-                    'default': True,
-                    'display_name': 'Small',
-                    'description': '6GB RAM',
-                    'kubespawner_override': { 'mem_guarantee':' 6G' },
-                },
-                {
-                    'display_name': 'Medium',
-                    'description': '12GB RAM',
-                    'kubespawner_override': { 'mem_guarantee': '12G' },
-                },
-                {
-                    'display_name': 'Large',
-                    'description': '24GB RAM',
-                    'kubespawner_override': { 'mem_guarantee': '24G' },
-                },
-            ]
+      extraConfig:
+        announcements: |
+          c.JupyterHub.template_vars.update({
+              'announcement': 'Under development by Erik Sundell, please feel free to contact me on the l2l slack!',
+          })
+        performance: |
+          c.JupyterHub.concurrent_spawn_limit = 100
+        auth: |
+          # Don't wait for users to press the orange button to login.
+          c.Authenticator.auto_login = True
+        templates: |
+          # Help JupyterHub find the templates we may mount
+          c.JupyterHub.template_paths.insert(0, "/etc/jupyterhub/templates")
+        metrics: |
+          # With this setting set to False, the /hub/metrics endpoint will be
+          # publically accessible just like at hub.mybinder.org/hub/metrics is.
+          c.JupyterHub.authenticate_prometheus = False
+        workingDir: |
+          # Override the working directory of /src/repo which repo2docker have set
+          # to /home/jovyan instead, where we mount of files.
+          c.KubeSpawner.extra_container_config = {
+              "workingDir": "/home/jovyan",
+          }
+        options_form: |
+          # Configure what spawn options users should see
+          # ---------------------------------------------
+          #
+          # NOTE: setting c.KubeSpawner.profile_list directly is easier, but then
+          #       we don't have the option to adjust it based on the individual
+          #       user at a later point in time if we want.
+          #
+          # NOTE: c.KubeSpawner.options_form, defined in the Spawner base class,
+          #       can be set to a fixed value, but it can also be a callable
+          #       function that returns a value. If this returned value is falsy,
+          #       no form will be rendered. In this case, we setup a callable
+          #       function that relies on KubeSpawner's internal logic to create
+          #       an options_form from the profile_list configuration.
+          #
+          #       ref: https://github.com/jupyterhub/jupyterhub/pull/2415
+          #       ref: https://github.com/jupyterhub/jupyterhub/issues/2390
+          #
+          async def dynamic_options_form(self):
+              self.profile_list = [
+                  {
+                      'default': True,
+                      'display_name': 'Small',
+                      'description': '6GB RAM',
+                      'kubespawner_override': { 'mem_guarantee':' 6G' },
+                  },
+                  {
+                      'display_name': 'Medium',
+                      'description': '12GB RAM',
+                      'kubespawner_override': { 'mem_guarantee': '12G' },
+                  },
+                  {
+                      'display_name': 'Large',
+                      'description': '24GB RAM',
+                      'kubespawner_override': { 'mem_guarantee': '24G' },
+                  },
+              ]
 
-            # NOTE: We let KubeSpawner inspect profile_list and decide what to
-            #       return, it will return a falsy blank string if there is no
-            #       profile_list, which makes no options form be presented.
-            #
-            # ref: https://github.com/jupyterhub/kubespawner/blob/37a80abb0a6c826e5c118a068fa1cf2725738038/kubespawner/spawner.py#L1885-L1935
-            #
-            return self._options_form_default()
+              # NOTE: We let KubeSpawner inspect profile_list and decide what to
+              #       return, it will return a falsy blank string if there is no
+              #       profile_list, which makes no options form be presented.
+              #
+              # ref: https://github.com/jupyterhub/kubespawner/blob/37a80abb0a6c826e5c118a068fa1cf2725738038/kubespawner/spawner.py#L1885-L1935
+              #
+              return self._options_form_default()
 
-        c.KubeSpawner.options_form = dynamic_options_form
-      pre_spawn_hook: |
-        # Configure details based on the user and profile chosen
-        # ------------------------------------------------------
-        #
-        async def pre_spawn_hook(spawner):
-            username = spawner.user.name
-            user_options = spawner.user_options # {'profile': 'display_name of chosen profile'}
+          c.KubeSpawner.options_form = dynamic_options_form
+        pre_spawn_hook: |
+          # Configure details based on the user and profile chosen
+          # ------------------------------------------------------
+          #
+          async def pre_spawn_hook(spawner):
+              username = spawner.user.name
+              user_options = spawner.user_options # {'profile': 'display_name of chosen profile'}
 
-        c.KubeSpawner.pre_spawn_hook = pre_spawn_hook
+          c.KubeSpawner.pre_spawn_hook = pre_spawn_hook
 
-  proxy:
-    pdb:
-      enabled: false
-    https:
+    proxy:
+      pdb:
+        enabled: false
+      https:
+        enabled: true
+        hosts: [l2l.sundellopensource.com]
+      service:
+        type: LoadBalancer
+
+    cull:
       enabled: true
-      hosts: [l2l.sundellopensource.com]
-    service:
-      type: LoadBalancer
-
-  cull:
-    enabled: true
-    # NOTE: This should probably be set to a value lower than or equal to 3600
-    #       seconds given that its easy to startup later, notebooks are
-    #       automatically saved, and it won't shutdown if something is running.
-    timeout: 1800
-    # NOTE: To have this at zero is probably a very bad idea as it make us fail
-    #       to scale down nodes. Typically there is always one straggler on a
-    #       node stuck in some code execution that doesn't end if it has housed
-    #       a hundred of users.
-    maxAge: 0 # Allow pods to run forever
+      # NOTE: This should probably be set to a value lower than or equal to 3600
+      #       seconds given that its easy to startup later, notebooks are
+      #       automatically saved, and it won't shutdown if something is running.
+      timeout: 1800
+      # NOTE: To have this at zero is probably a very bad idea as it make us fail
+      #       to scale down nodes. Typically there is always one straggler on a
+      #       node stuck in some code execution that doesn't end if it has housed
+      #       a hundred of users.
+      maxAge: 0 # Allow pods to run forever
 
 # Reference on the Grafana Helm chart's configuration options:
 # https://github.com/helm/charts/blob/master/stable/grafana/values.yaml
