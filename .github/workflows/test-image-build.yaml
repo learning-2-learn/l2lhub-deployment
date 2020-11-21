@@ -38,7 +38,7 @@ jobs:
       # FIXME: update to official hubploy when my aws PRs are merged
       - name: Install hubploy
         run: |
-          pip install git+https://github.com/consideratio/hubploy.git@pr/ecr-cred-refactor
+          pip install https://github.com/yuvipanda/hubploy/archive/master.zip
 
       - name: Test image build
         run: |
