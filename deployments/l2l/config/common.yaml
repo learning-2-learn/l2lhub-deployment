@@ -1,5 +1,5 @@
 tags:
-  metrics: false
+  metrics: true
   dask-gateway: true
 
 jupyterhub:
@@ -10,8 +10,8 @@ jupyterhub:
       # clientSecret is set in secrets folder
       callbackUrl: https://l2l.sundellopensource.com/hub/oauth_callback
 
-  debug:
-    enabled: true
+  # debug:
+  #   enabled: true
 
   prePuller:
     hook:
@@ -205,8 +205,8 @@ grafana:
   # Reference on Grafana's configuration options:
   # https://grafana.com/docs/grafana/latest/administration/configuration/
   grafana.ini:
-    log:
-      level: debug
+    # log:
+    #   level: debug
     security:
       cookie_secure: true
       # secret_key is set in secrets folder
