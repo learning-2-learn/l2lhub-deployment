@@ -135,26 +135,8 @@ daskhub:
 grafana:
   fullnameOverride: grafana
   adminUser: admin
-
-  # NOTE: It can be useful to be able to render an image of a chart, but that
-  #       requires a workaround configuration of the Grafana Helm chart at the
-  #       moment.
-  #
-  #       workaround: https://github.com/helm/charts/issues/21959#issuecomment-640653320
-  #       issue with workaround: https://github.com/grafana/grafana/issues/25716
-  extraContainers: |
-    - name: renderer
-      image: grafana/grafana-image-renderer:latest
-      resources:
-        requests:
-          memory: 128Mi
-          cpu: 10m
-        limits:
-          memory: 512Mi
-          cpu: 250m
-  env:
-    GF_RENDERING_SERVER_URL: http://localhost:8081/render
-    GF_RENDERING_CALLBACK_URL: http://localhost:3000/services/grafana
+  imageRenderer:
+    enabled: true
 
   # NOTE: We need Recreate when using a persistence PVC. If we use an external
   # database, we can do a RollingUpdate instead.
