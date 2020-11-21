@@ -56,13 +56,33 @@
 #   https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/intrinsic-function-reference-join.html
 #
 
-# The resources we want to be created in the "stack" named l2l-hubploy
+# The parameters we need to provide to create this cloudformation stack
+Parameters:
+  # ref: https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/parameters-section-structure.html
+  EksClusterName:
+    Type: String
+    Default: l2l
+  EcrRepositoryName:
+    Type: String
+    Default: l2l/user-env
+  IamUserName:
+    Type: String
+    Default: hubploy
+  IamRoleNameEcr:
+    Type: String
+    Default: hubploy-ecr
+  IamRoleNameEks:
+    Type: String
+    Default: hubploy-eks
+
+
+# The resources we want to be created as part of this cloudformation stack
 Resources:
   # ref: https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-iam-user.html
   IamUser:
     Type: AWS::IAM::User
     Properties:
-      UserName: hubploy
+      UserName: { Ref: IamUserName }
 
   # ref: https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-iam-accesskey.html
   IamAccessKey:
@@ -74,12 +94,13 @@ Resources:
   IamRoleEcr:
     Type: AWS::IAM::Role
     Properties:
-      RoleName: hubploy-ecr
+      RoleName: { Ref: IamRoleNameEcr }
       Policies:
         - PolicyName: EcrAccess
           PolicyDocument:
             Version: 2012-10-17
             Statement:
+              # I have failed restricting this further...
               - Effect: Allow
                 Action:
                   - ecr:*
@@ -101,7 +122,7 @@ Resources:
   IamRoleEks:
     Type: AWS::IAM::Role
     Properties:
-      RoleName: hubploy-eks
+      RoleName: { Ref: IamRoleNameEks }
       Policies:
         - PolicyName: EksAccess
           PolicyDocument:
@@ -110,7 +131,14 @@ Resources:
               - Effect: Allow
                 Action:
                   - eks:DescribeCluster
-                Resource: !Sub arn:aws:eks:${AWS::Region}:${AWS::AccountId}:cluster/l2l
+                Resource: !Join
+                - ''
+                - - 'arn:aws:eks:'
+                  - !Ref AWS::Region
+                  - ':'
+                  - !Ref AWS::AccountId
+                  - ':cluster/'
+                  - { Ref: EksClusterName }
       AssumeRolePolicyDocument:
         Version: 2012-10-17
         Statement: 
@@ -130,7 +158,7 @@ Resources:
   EcrRepository:
     Type: AWS::ECR::Repository
     Properties: 
-      RepositoryName: l2l/user-env
+      RepositoryName: { Ref: EcrRepositoryName }
       RepositoryPolicyText:
         Version: 2008-10-17
         Statement:
@@ -178,6 +206,7 @@ Resources:
               - "kms:GenerateDataKeyWithoutPlaintext"
             Resource: '*'
 
+
 # The relevant information from the created resources.
 Outputs:
   IamRoleEksArn:
@@ -187,7 +216,13 @@ Outputs:
     Value: !GetAtt IamRoleEcr.Arn
     Description: Use this to set images[0].registry.aws.role_arn in hubploy.yaml
   EcrRepository:
-    Value: !GetAtt EcrRepository.Arn
+    Value: !Join
+      - ''
+      - - !Ref AWS::AccountId
+        - .dkr.ecr.
+        - !Ref AWS::Region
+        - .amazonaws.com/
+        - { Ref: EcrRepositoryName }
     Description: Use this to set images[0].image_name in hubploy.yaml
   KmsKeyArn:
     Value: !GetAtt KmsKey.Arn

@@ -1,49 +1,63 @@
-# This eksctl configuration file represents the cluster
-# ref:      https://eksctl.io/usage/schema/
-# ref:      https://eksctl.io/usage/security/
+# This eksctl configuration file represents the cluster and node groups for use
+# by the cluster.
+# ref: https://eksctl.io/usage/schema/
 #
-# create:   eksctl create cluster --config-file eksctl-cluster-config.yaml --set-kubeconfig-context
-# upgrade:  eksctl upgrade cluster --config-file eksctl-cluster-config.yaml
-# delete:   eksctl delete cluster --config-file eksctl-cluster-config.yaml
+# Cluster operations:
+# ref: https://eksctl.io/usage/cluster-upgrade/
+#
+#   create:   eksctl create cluster --config-file eksctl-cluster-config.yaml --set-kubeconfig-context
+#   upgrade:  eksctl upgrade cluster --config-file eksctl-cluster-config.yaml
+#   delete:   eksctl delete cluster --config-file eksctl-cluster-config.yaml
+#
+# Node group operations:
+# ref: https://eksctl.io/usage/managing-nodegroups/
+#
+#   eksctl create nodegroup --config-file eksctl-cluster-config.yaml --include user-b,worker-b
+#   eksctl delete nodegroup --cluster l2l --name user-a
 #
 # Attribution: this was based on @yuvipanda's work in 2i2c! <3
 # ref: https://github.com/2i2c-org/pangeo-hubs/blob/8e552bc198d8339efe8c003cb847849255e8f8ed/aws/eksctl-config.yaml
 #
+
 apiVersion: eksctl.io/v1alpha5
 kind: ClusterConfig
 metadata:
   name: l2l
-  # region was chosen to to us-west-2 (Oregon) over us-east-2 (Ohio) which was
-  # another reasonable option for the sake of data locality, see what to
-  # consider in this great guide: https://www.concurrencylabs.com/blog/choose-your-aws-region-wisely/
+  # region:
+  #   The region was chosen to to us-west-2 (Oregon) over us-east-2 (Ohio) which
+  #   was another reasonable option for the sake of data locality, see what to
+  #   consider in this great guide:
+  #   https://www.concurrencylabs.com/blog/choose-your-aws-region-wisely/
   region: us-west-2
   version: "1.18"
-
-# availabilityZones: for the EKS control plane, arbitrary chosen but made
-# explicit to ensure we can locate the node pool on an AZ where the EKS control
-# plane exist as required.
+# availabilityZones: 
+#   For the EKS control plane, arbitrary chosen but made explicit to ensure we
+#   can locate the node pool on an AZ where the EKS control plane exist as
+#   required.
 availabilityZones: [us-west-2d, us-west-2b, us-west-2a]
-
 iam:
   withOIDC: true        # https://eksctl.io/usage/security/#withoidc
-  disablePodIMDS: true  # https://eksctl.io/usage/security/#disablepodimds
 
-# When choosing machine type, consider:
+# Choose the type of node group?
+# - nodeGroups cannot be updated but must be recreated on changes:
+#   https://eksctl.io/usage/managing-nodegroups/#nodegroup-immutability
+# - managedNodeGroups cannot scale to zero:
+#   https://github.com/aws/containers-roadmap/issues/724
+#
+# Choosing machine type?
 # - Maximum pods: https://github.com/awslabs/amazon-eks-ami/blob/master/files/eni-max-pods.txt
 # - Node specs:   https://aws.amazon.com/ec2/instance-types/
 #
-# With managedNodeGroups, you can upgrade a node group like this:
-#
-#   eksctl upgrade nodegroup --config-file eksctl-cluster-config.yaml
-#
-# With nodeGroups, you can have a minSize of 0 which managedNodeGroups doesn't
-# support yet: https://github.com/aws/containers-roadmap/issues/724
-# 
-managedNodeGroups:
-  # Core node group to hold non-user content
-  - name: core
+# Management advice:
+# - Always use a suffix for node group names that you can replace with something
+#   to create a new node group and delete the old. You will run into issues if
+#   you name it "core" and "core-a" instead of "core-a" and "core-b", such as
+#   when deleting "core" you end up draining both node groups.
+nodeGroups:
+  - name: core-a
+    availabilityZones: [us-west-2d]   # aws ec2 describe-availability-zones --region <region-name>
     instanceType: m5.large   # 28 pods, 2 cpu, 8 GB
-    minSize: 1
+    minSize: 0
     maxSize: 2
     desiredCapacity: 1
     volumeSize: 80
@@ -54,12 +68,42 @@ managedNodeGroups:
     #       cluster can use a node group.
     # ref: https://github.com/kubernetes/autoscaler/blob/master/cluster-autoscaler/cloudprovider/aws/README.md#auto-discovery-setup
     tags:
-      # automaticly added by eksctl: k8s.io/cluster-autoscaler/<cluster-name>
-      # automaticly added by eksctl: k8s.io/cluster-autoscaler/enabled
       k8s.io/cluster-autoscaler/node-template/label/hub.jupyter.org/node-purpose: core
-    # availabilityZones: aws ec2 describe-availability-zones --region <region-name>
-    availabilityZones: [us-west-2d]
+      # k8s.io/cluster-autoscaler/<cluster-name>  - automaticly added by eksctl!
+      # k8s.io/cluster-autoscaler/enabled         - automaticly added by eksctl!
     iam:
       withAddonPolicies:
-        # autoscaler: enables IAM policy for cluster-autoscaler
+        autoScaler: true
+
+  - name: user-a
+    availabilityZones: [us-west-2d]
+    instanceType: m5.2xlarge   # 57 pods, 8 cpu, 32 GB
+    minSize: 0
+    maxSize: 20
+    desiredCapacity: 0
+    volumeSize: 80
+    labels:
+      hub.jupyter.org/node-purpose: user
+    tags:
+      k8s.io/cluster-autoscaler/node-template/label/hub.jupyter.org/node-purpose: user
+    iam:
+      withAddonPolicies:
+        autoScaler: true
+
+  - name: worker-a
+    availabilityZones: [us-west-2d]
+    instanceType: m5.2xlarge   # 57 pods, 8 cpu, 32 GB
+    minSize: 0
+    maxSize: 20
+    desiredCapacity: 0
+    volumeSize: 80
+    labels:
+      worker: "true"
+    taints:
+      worker: "true:NoSchedule"
+    tags:
+      k8s.io/cluster-autoscaler/node-template/label/worker: "true"
+      k8s.io/cluster-autoscaler/node-template/taint/worker: "true:NoSchedule"
+    iam:
+      withAddonPolicies:
         autoScaler: true
