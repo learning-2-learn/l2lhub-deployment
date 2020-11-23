@@ -91,8 +91,7 @@ nodeGroups:
         autoScaler: true
 
   - name: worker-a
-    availabilityZones: [us-west-2d]
-    instanceType: m5.2xlarge   # 57 pods, 8 cpu, 32 GB
+    availabilityZones: [us-west-2d, us-west-2b, us-west-2a]
     minSize: 0
     maxSize: 20
     desiredCapacity: 0
@@ -107,3 +106,20 @@ nodeGroups:
     iam:
       withAddonPolicies:
         autoScaler: true
+    # Spot instance configuration
+    instancesDistribution:  # ref: https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-autoscaling-autoscalinggroup-instancesdistribution.html
+      # By providing more options both in the availability zone and instance
+      # type, we allow for better cost pricing optimizations.
+      instanceTypes:
+        - m5.xlarge    # 57 pods, 4 cpu, 16 GB
+        - m5.2xlarge   # 57 pods, 8 cpu, 32 GB
+        - m5.4xlarge   # 233 pods, 16 cpu, 64 GB
+        - m5a.xlarge    # 57 pods, 4 cpu, 16 GB
+        - m5a.2xlarge   # 57 pods, 8 cpu, 32 GB
+        - m5a.4xlarge   # 233 pods, 16 cpu, 64 GB
+        - m5n.xlarge    # 57 pods, 4 cpu, 16 GB
+        - m5n.2xlarge   # 57 pods, 8 cpu, 32 GB
+        - m5n.4xlarge   # 233 pods, 16 cpu, 64 GB
+      onDemandBaseCapacity: 0
+      onDemandPercentageAboveBaseCapacity: 0
+      spotAllocationStrategy: "capacity-optimized"  # ref: https://aws.amazon.com/blogs/compute/introducing-the-capacity-optimized-allocation-strategy-for-amazon-ec2-spot-instances/
