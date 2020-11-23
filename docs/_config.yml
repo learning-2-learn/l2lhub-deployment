@@ -1,0 +1,15 @@
+# Book settings
+# Learn more at https://jupyterbook.org/customize/config.html
+#
+title: Learning 2 Learn - JupyterHub
+author: Erik Sundell
+logo: logo.png
+repository:
+  url: https://github.com/learning-2-learn/l2lhub-deployment
+  path_to_book: docs
+  branch: aws-2020
+html:
+  use_repository_button: true
+  use_issues_button: true
+  use_edit_page_button: true
+  baseurl: https://docs.l2l.sundellopensource.com

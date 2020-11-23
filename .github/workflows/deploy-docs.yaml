@@ -1,0 +1,42 @@
+name: deploy-docs
+
+on:
+  push:
+    paths:
+      - "docs/**"
+      - ".github/workflows/deploy-docs.yaml"
+    branches:
+      - aws-2020
+
+defaults:
+  run:
+    shell: bash
+
+# This job builds the jupyter-book based documentation, and pushes it to
+# `gh-pages` where it is published as static web content.
+jobs:
+  deploy-book:
+    runs-on: ubuntu-20.04
+    steps:
+    - name: Git clone and checkout master
+      uses: actions/checkout@v2
+
+    - name: Set up Python 3.8
+      uses: actions/setup-python@v1
+      with:
+        python-version: 3.8
+
+    - name: Install docs dependencies
+      run: |
+        pip install -r docs/requirements.txt
+
+    - name: Build the docs
+      run: |
+        jupyter-book build ./docs
+
+    - name: Push built docs to gh-pages branch
+      uses: peaceiris/actions-gh-pages@v3.6.1
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./docs/_build/html
+        publish_branch: gh-pages
