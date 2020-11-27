@@ -1,4 +1,0 @@
-graphviz
-nano
-octave
-vim
