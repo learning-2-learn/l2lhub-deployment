@@ -1,0 +1,12 @@
+jupyter labextension install --debug \
+    @jupyter-widgets/jupyterlab-manager \
+    @lckr/jupyterlab_variableinspector \
+    @pyviz/jupyterlab_pyviz \
+    bqplot@0.5.16 \
+    dask-labextension
+
+jupyter serverextension enable --sys-prefix --py dask_labextension
+jupyter serverextension enable --sys-prefix --py nbresuse
+
+HDF5_DIR=$NB_PYTHON_PREFIX pip install --no-binary=h5py git+https://github.com/h5py/h5py.git
+pip install git+https://github.com/catalystneuro/HDF5Zarr.git

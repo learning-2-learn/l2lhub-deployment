@@ -1,0 +1,4 @@
+graphviz
+nano
+octave
+vim
