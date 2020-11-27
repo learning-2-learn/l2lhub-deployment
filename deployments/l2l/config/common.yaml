@@ -16,21 +16,16 @@ daskhub:
   # https://github.com/jupyterhub/zero-to-jupyterhub-k8s/blob/master/jupyterhub/values.yaml
   jupyterhub:
     auth:
-      whitelist:
-        users:
-          - arokem
-          - consideratio
       admin:
         access: false
         users:
           - arokem
-          - consideratio
-
       type: github
       github:
         # clientId is set in secrets folder
         # clientSecret is set in secrets folder
         callbackUrl: https://l2l.sundellopensource.com/hub/oauth_callback
+        allowedOrganizations: learning-2-learn
 
     prePuller:
       hook:
