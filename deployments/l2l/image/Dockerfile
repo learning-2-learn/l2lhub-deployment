@@ -20,7 +20,7 @@ USER ${NB_USER}
 # We only need to install packages not listed in this file already:
 # https://github.com/pangeo-data/pangeo-docker-images/blob/master/pangeo-notebook/packages.txt
 RUN echo "Installing conda packages..." \
- && mamba install -c plotly \
+ && mamba install -n ${CONDA_ENV} -y -c plotly \
         cython \
         google-cloud-sdk \
         plotly \
@@ -31,7 +31,7 @@ RUN echo "Installing conda packages..." \
 # https://github.com/pangeo-data/pangeo-docker-images/blob/master/pangeo-notebook/packages.txt
 RUN echo "Installing pip packages..." \
  && HDF5_DIR=$NB_PYTHON_PREFIX \
-    pip install --no-cache-dir --no-binary=h5py \
+    ${NB_PYTHON_PREFIX}/bin/pip install --no-cache-dir --no-binary=h5py \
         bqplot \
             # ref: https://github.com/bqplot/bqplot
         bycycle==0.1.* \
@@ -75,6 +75,7 @@ RUN echo "Installing pip packages..." \
 
 
 RUN echo "Installing jupyterlab extensions..." \
+    && export PATH=${NB_PYTHON_PREFIX}/bin:${PATH} \
     && jupyter labextension install -y --clean \
         @lckr/jupyterlab_variableinspector \
         bqplot \
@@ -83,4 +84,5 @@ RUN echo "Installing jupyterlab extensions..." \
 
 
 RUN echo "Enabling jupyter serverextensions..." \
+    && export PATH=${NB_PYTHON_PREFIX}/bin:${PATH} \
     && jupyter serverextension enable --sys-prefix --py nbresuse
