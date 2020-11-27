@@ -73,7 +73,7 @@ daskhub:
               - "/etc/singleuser/k8s-lifecycle-hook-post-start.sh"
       storage:
         storage:
-          capacity: 10Gi
+          capacity: 100Gi
         extraVolumes:
           ## Comment out the nh-nfs volume if nfs.enabled: false
           # - name: nh-nfs
