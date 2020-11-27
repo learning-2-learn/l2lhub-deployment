@@ -9,10 +9,6 @@ tags:
 
 
 
-nfs:
-  enabled: false
-
-
 # Reference on the configuration options:
 # https://github.com/dask/helm-chart/blob/master/daskhub/values.yaml
 daskhub:
