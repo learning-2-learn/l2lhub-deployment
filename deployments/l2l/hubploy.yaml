@@ -6,6 +6,7 @@
 
 images:
   image_name: 423786577274.dkr.ecr.us-west-2.amazonaws.com/l2l/user-env
+  image_config_path: daskhub.jupyterhub.singleuser.image
   registry:
     provider: aws
     aws:
