@@ -25,7 +25,8 @@ daskhub:
         # clientId is set in secrets folder
         # clientSecret is set in secrets folder
         callbackUrl: https://l2l.sundellopensource.com/hub/oauth_callback
-        allowedOrganizations: learning-2-learn
+        allowedOrganizations:
+          - learning-2-learn
 
     prePuller:
       hook:
