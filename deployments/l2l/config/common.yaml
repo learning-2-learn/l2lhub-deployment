@@ -284,7 +284,7 @@ daskhub:
         # having 1:4 ratio between CPU and GB of memory. By providing the
         # username label, we help administrators to track user pods.
         option_handler: |
-          from dask_gateway_server.options import Options, Select, Mapping
+          from dask_gateway_server.options import Options, Select, String, Mapping
           def cluster_options(user):
               def option_handler(options):
                   if ":" not in options.image:
