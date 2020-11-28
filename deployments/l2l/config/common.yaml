@@ -53,6 +53,12 @@ daskhub:
           matchNodePurpose: require
 
     singleuser:
+      extraEnv:
+        # The default worker image matches the singleuser image.
+        DASK_GATEWAY__CLUSTER__OPTIONS__IMAGE: '{JUPYTER_IMAGE_SPEC}'
+        DASK_DISTRIBUTED__DASHBOARD_LINK: '/user/{JUPYTERHUB_USER}/proxy/{port}/status'
+        DASK_LABEXTENSION__FACTORY__MODULE: 'dask_gateway'
+        DASK_LABEXTENSION__FACTORY__CLASS: 'GatewayCluster'
       defaultUrl: /lab
       startTimeout: 900
       cpu:  # defaults for when profile_list is bypassed, for example by user-placeholder pods
@@ -149,8 +155,6 @@ daskhub:
           c.JupyterHub.template_vars.update({
               'announcement': 'Under development by Erik Sundell, please feel free to contact me on the l2l slack!',
           })
-        performance: |
-          c.JupyterHub.concurrent_spawn_limit = 100
         auth: |
           # Don't wait for users to press the orange button to login.
           c.Authenticator.auto_login = True
@@ -270,6 +274,55 @@ daskhub:
       prefix: "/services/dask-gateway"  # Connect to Dask-Gateway through a JupyterHub service.
       auth:
         type: jupyterhub  # Use JupyterHub to authenticate with Dask-Gateway
+      extraConfig:
+        # This configuration represents options that can be presented to users
+        # that want to create a Dask cluster using dask-gateway. For more
+        # details, see https://gateway.dask.org/cluster-options.html
+        #
+        # The goal is to provide a simple configuration that allow the user some
+        # flexibility while also fitting well well on AWS nodes that are all
+        # having 1:4 ratio between CPU and GB of memory. By providing the
+        # username label, we help administrators to track user pods.
+        option_handler: |
+          from dask_gateway_server.options import Options, Select, Mapping
+          def cluster_options(user):
+              def option_handler(options):
+                  extra_labels = {
+                      "hub.jupyter.org/username": user.name,
+                  }
+                  chosen_worker_cpu = int(options.worker_specification.split("CPU")[0])
+                  chosen_worker_memory = 4 * chosen_worker_cpu
+
+                  # We multiply the requests by a fraction to ensure that the
+                  # worker fit well within a node that need some resources
+                  # reserved for system pods.
+                  return {
+                      "worker_cores": 0.80 * chosen_worker_cpu,
+                      "worker_cores_limit": chosen_worker_cpu * 2,
+                      "worker_memory": "%fG" % (0.95 * chosen_worker_memory),
+                      "worker_memory_limit": "%fG" % chosen_worker_memory,
+                      "scheduler_extra_pod_labels": extra_labels,
+                      "worker_extra_pod_labels": extra_labels,
+                      "environment": options.environment,
+                  }
+              return Options(
+                  Select(
+                      "worker_specification",
+                      ["1CPU, 4GB", "2CPU, 8GB", "4CPU, 16GB", "8CPU, 32GB", "16CPU, 64GB"],
+                      default="1CPU, 4GB",
+                      label="Worker specification",
+                  )
+                  Mapping("environment", {}, label="Environment variables"),
+                  handler=option_handler,
+              )
+          c.Backend.cluster_options = cluster_options
+        idle: |
+          # timeout after 30 minutes of inactivity
+          c.KubeClusterConfig.idle_timeout = 1800
+        limits: |
+          # # per Dask cluster limits.
+          # c.ClusterConfig.cluster_max_cores = 100
+          # c.ClusterConfig.cluster_max_memory = "600G"
       backend:
         scheduler:
           extraPodConfig:
@@ -282,7 +335,17 @@ daskhub:
                 value: user
 
         worker:
+          extraContainerConfig:
+            # Pack scheduler and worker pods on nodes just like we do with the
+            # user pods to help scale down not needed nodes.
+            schedulerName: l2l-prod-user-scheduler
+            securityContext:
+              runAsGroup: 1000
+              runAsUser: 1000
           extraPodConfig:
+            schedulerName: l2l-prod-user-scheduler
+            securityContext:
+              fsGroup: 1000
             nodeSelector:
               worker: "true"
             tolerations:
