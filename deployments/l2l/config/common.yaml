@@ -287,6 +287,9 @@ daskhub:
           from dask_gateway_server.options import Options, Select, Mapping
           def cluster_options(user):
               def option_handler(options):
+                  if ":" not in options.image:
+                      raise ValueError("When specifying an image you must also provide a tag")
+
                   extra_labels = {
                       "hub.jupyter.org/username": user.name,
                   }
@@ -297,6 +300,7 @@ daskhub:
                   # worker fit well within a node that need some resources
                   # reserved for system pods.
                   return {
+                      "image": options.image,
                       "worker_cores": 0.80 * chosen_worker_cpu,
                       "worker_cores_limit": chosen_worker_cpu * 2,
                       "worker_memory": "%fG" % (0.95 * chosen_worker_memory),
