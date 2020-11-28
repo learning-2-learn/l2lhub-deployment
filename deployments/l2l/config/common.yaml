@@ -316,6 +316,7 @@ daskhub:
                       default="1CPU, 4GB",
                       label="Worker specification",
                   ),
+                  String("image", default="my-custom-image:latest", label="Image"),
                   Mapping("environment", {}, label="Environment variables"),
                   handler=option_handler,
               )
