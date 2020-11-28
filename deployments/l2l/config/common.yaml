@@ -311,7 +311,7 @@ daskhub:
                       ["1CPU, 4GB", "2CPU, 8GB", "4CPU, 16GB", "8CPU, 32GB", "16CPU, 64GB"],
                       default="1CPU, 4GB",
                       label="Worker specification",
-                  )
+                  ),
                   Mapping("environment", {}, label="Environment variables"),
                   handler=option_handler,
               )
