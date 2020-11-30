@@ -18,7 +18,7 @@ c.NotebookApp.iopub_data_rate_limit = 1e12
 # kernels, but only those that are not already listed.
 #
 # ref: https://github.com/Anaconda-Platform/nb_conda_kernels
-c.CondaKernelSpecManager.name_format = '{environment}'
+c.CondaKernelSpecManager.name_format = '{1}'
 # Let's avoid using a base kernel alongside the notebook kernel, they should be
 # the same. The expression matches everything except that specific env.
 c.CondaKernelSpecManager.env_filter = '^((?!/srv/conda/envs/notebook).)*$'
