@@ -19,6 +19,8 @@ c.NotebookApp.iopub_data_rate_limit = 1e12
 #
 # ref: https://github.com/Anaconda-Platform/nb_conda_kernels
 c.CondaKernelSpecManager.name_format = '{1}'
-# Let's avoid using a base kernel alongside the notebook kernel, they should be
-# the same. The expression matches everything except that specific env.
-c.CondaKernelSpecManager.env_filter = '^((?!/srv/conda/envs/notebook).)*$'
+# This filter is to avoid having the jupyterlab launcher show a duplicated entry
+# for Python and Octave as there are two duplicated environments, the "base" and
+# "notebook" conda environment. Like this, we only use the "base" environment
+# which should be the same.
+c.CondaKernelSpecManager.env_filter = '"((?!envs/notebook).)*"'
