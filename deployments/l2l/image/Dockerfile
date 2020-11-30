@@ -86,3 +86,9 @@ RUN echo "Installing jupyterlab extensions..." \
 RUN echo "Enabling jupyter serverextensions..." \
     && export PATH=${NB_PYTHON_PREFIX}/bin:${PATH} \
     && jupyter serverextension enable --sys-prefix --py nbresuse
+
+
+# Configure conda to create new environments within the home folder by default.
+# This allows the environments to remain in between restarts of the container
+# if only the home folder is persisted.
+RUN conda config --system --prepend envs_dirs '~/.conda/envs'
