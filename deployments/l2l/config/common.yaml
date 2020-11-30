@@ -302,8 +302,8 @@ daskhub:
                   return {
                       "image": options.image,
                       "worker_cores": 0.80 * chosen_worker_cpu,
-                      "worker_cores_limit": chosen_worker_cpu * 2,
-                      "worker_memory": "%fG" % (0.95 * chosen_worker_memory),
+                      "worker_cores_limit": chosen_worker_cpu,
+                      "worker_memory": "%fG" % (0.92 * chosen_worker_memory),
                       "worker_memory_limit": "%fG" % chosen_worker_memory,
                       "scheduler_extra_pod_labels": extra_labels,
                       "worker_extra_pod_labels": extra_labels,
