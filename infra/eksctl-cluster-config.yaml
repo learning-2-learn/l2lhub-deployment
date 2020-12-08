@@ -5,14 +5,14 @@
 # Cluster operations:
 # ref: https://eksctl.io/usage/cluster-upgrade/
 #
-#   create:   eksctl create cluster --config-file eksctl-cluster-config.yaml --set-kubeconfig-context
-#   upgrade:  eksctl upgrade cluster --config-file eksctl-cluster-config.yaml
-#   delete:   eksctl delete cluster --config-file eksctl-cluster-config.yaml
+#   create:   eksctl create cluster --config-file=eksctl-cluster-config.yaml --set-kubeconfig-context
+#   upgrade:  eksctl upgrade cluster --config-file=eksctl-cluster-config.yaml
+#   delete:   eksctl delete cluster --config-file=eksctl-cluster-config.yaml
 #
 # Node group operations:
 # ref: https://eksctl.io/usage/managing-nodegroups/
 #
-#   eksctl create nodegroup --config-file eksctl-cluster-config.yaml --include user-b,worker-b
+#   eksctl create nodegroup --config-file=eksctl-cluster-config.yaml --include user-b,worker-b
 #   eksctl delete nodegroup --cluster l2l --name user-a
 #
 # Attribution: this was based on @yuvipanda's work in 2i2c! <3
@@ -35,8 +35,26 @@ metadata:
 #   can locate the node pool on an AZ where the EKS control plane exist as
 #   required.
 availabilityZones: [us-west-2d, us-west-2b, us-west-2a]
+
+# This section will create additional k8s ServiceAccount's that are coupled with
+# AWS Role's. By declaring pods to use them, you can grant these pods the
+# associated permissions. For this deployment, we create a k8s ServiceAccount
+# with Full S3 credentials which we then also declare user pods and dask worker
+# pods will make use of.
 iam:
   withOIDC: true        # https://eksctl.io/usage/security/#withoidc
+  # serviceAccounts like nodeGroups etc can be managed directly with eksctl, for
+  # more information, see: https://eksctl.io/usage/iamserviceaccounts/
+  #
+  #   eksctl create iamserviceaccount --config-file=eksctl-cluster-config.yaml
+  #
+  serviceAccounts:
+    - metadata:
+        name: s3-full-access
+        namespace: default
+        labels: {aws-usage: "application"}
+      attachPolicyARNs:
+        - "arn:aws:iam::aws:policy/AmazonS3FullAccess"
 
 # Choose the type of node group?
 # - nodeGroups cannot be updated but must be recreated on changes:
