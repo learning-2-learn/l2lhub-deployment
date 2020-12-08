@@ -53,6 +53,10 @@ daskhub:
           matchNodePurpose: require
 
     singleuser:
+      # Allow all our users' pods unconditional access to the AWS account's S3
+      # storage. This required some associated configuration in
+      # infra/eksctl-cluster-config.yaml!
+      serviceAccountName: "s3-full-access"
       extraEnv:
         # The default worker image matches the singleuser image.
         DASK_GATEWAY__CLUSTER__OPTIONS__IMAGE: '{JUPYTER_IMAGE_SPEC}'
@@ -341,6 +345,10 @@ daskhub:
 
         worker:
           extraContainerConfig:
+            # Allow all our worker pods unconditional access to the AWS
+            # account's S3 storage. This required some associated configuration
+            # in infra/eksctl-cluster-config.yaml!
+            serviceAccountName: "s3-full-access"
             # Pack scheduler and worker pods on nodes just like we do with the
             # user pods to help scale down not needed nodes.
             schedulerName: l2l-prod-user-scheduler
