@@ -55,11 +55,8 @@ RUN echo "Installing pip packages..." \
             # ref: https://github.com/mne-tools/mne-python
         nbresuse \
             # ref: https://github.com/jupyter-server/jupyter-resource-usage
-        # nitime \
+        nitime \
             # ref: https://github.com/nipy/nitime
-            # FIXME: nitime build fails currently. A key suspect is that our
-            #        environment from pangeo-notebook use Python 3.8 instead of
-            #        Python 3.7 as was used before.
         nwbwidgets \
             # ref: https://github.com/NeurodataWithoutBorders/nwb-jupyter-widgets
         oct2py \
