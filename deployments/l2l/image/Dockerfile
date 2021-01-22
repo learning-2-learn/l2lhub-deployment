@@ -65,6 +65,8 @@ RUN echo "Installing pip packages..." \
             # ref: https://github.com/Calysto/octave_kernel
         pactools \
             # ref: https://github.com/pactools/pactools
+        python-picard \
+            # ref: https://github.com/pierreablin/picard
         seaborn \
             # ref: https://github.com/mwaskom/seaborn
  && echo "Installing pip packages complete!"
