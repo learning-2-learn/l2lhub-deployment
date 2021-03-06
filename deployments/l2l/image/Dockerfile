@@ -3,6 +3,9 @@
 # pangeo/pangeo-notebook definition: https://github.com/pangeo-data/pangeo-docker-images/tree/master/pangeo-notebook
 # pangeo/pangeo-notebook tags: https://hub.docker.com/r/pangeo/pangeo-notebook/tags
 # pangeo-notebook conda package: https://github.com/conda-forge/pangeo-notebook-feedstock/blob/master/recipe/meta.yaml
+#
+# NOTE: pangeo/pangeo-notebook:2021.03.01 bumps JupyterLab 2 to JupyterLab 3
+#       which is likeley quite breaking.
 FROM pangeo/pangeo-notebook:2020.11.18
 ARG DEBIAN_FRONTEND=noninteractive
 
@@ -49,6 +52,12 @@ RUN echo "Installing pip packages..." \
             # ref: https://github.com/catalystneuro/HDF5Zarr
         git+https://github.com/neurodsp-tools/neurodsp@ed82caa2d93606d1500de0997dce962b81bc69eb \
             # ref: https://github.com/neurodsp-tools/neurodsp
+        jupyterlab_hdf \
+            # NOTE: Currently does not support JupyterLab 3 it seems:
+            #       https://github.com/jupyterlab/jupyterlab-hdf5/issues/42
+            # NOTE: Has an associated JupyterLab extension that needs to be
+            #       installed explicitly as of 2021-03-06.
+            # ref: https://github.com/jupyterlab/jupyterlab-hdf5
         line_profiler \
             # ref: https://github.com/pyutils/line_profiler
         mne \
@@ -77,6 +86,7 @@ RUN echo "Installing jupyterlab extensions..." \
     && export PATH=${NB_PYTHON_PREFIX}/bin:${PATH} \
     && jupyter labextension install -y --clean \
         @lckr/jupyterlab_variableinspector \
+        @jupyterlab/hdf5 \
         bqplot \
  && echo "Installing jupyterlab extensions complete!"
 
