@@ -199,17 +199,17 @@ daskhub:
                       'default': True,
                       'display_name': 'Small',
                       'description': '6GB RAM',
-                      'kubespawner_override': { 'mem_guarantee':' 6G' },
+                      'kubespawner_override': { 'mem_guarantee':' 6G', 'mem_limit':' 12G' },
                   },
                   {
                       'display_name': 'Medium',
                       'description': '12GB RAM',
-                      'kubespawner_override': { 'mem_guarantee': '12G' },
+                      'kubespawner_override': { 'mem_guarantee': '12G', 'mem_limit':' 24G' },
                   },
                   {
                       'display_name': 'Large',
                       'description': '24GB RAM',
-                      'kubespawner_override': { 'mem_guarantee': '24G' },
+                      'kubespawner_override': { 'mem_guarantee': '24G', 'mem_limit':' 48G' },
                   },
               ]
 
