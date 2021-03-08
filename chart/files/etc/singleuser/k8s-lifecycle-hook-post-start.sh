@@ -11,4 +11,5 @@
 # this script to fail. If so, then perhaps this could work:
 # https://stackoverflow.com/questions/64786/error-handling-in-bash
 
+conda activate notebook || true
 pip install git+https://github.com/learning-2-learn/lfp_tools || true
