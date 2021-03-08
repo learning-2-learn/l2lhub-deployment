@@ -5,8 +5,9 @@
 # pangeo-notebook conda package: https://github.com/conda-forge/pangeo-notebook-feedstock/blob/master/recipe/meta.yaml
 #
 # NOTE: pangeo/pangeo-notebook:2021.03.01 bumps JupyterLab 2 to JupyterLab 3
-#       which is likeley quite breaking.
-FROM pangeo/pangeo-notebook:2020.11.18
+#       which is likeley quite breaking. 2021.02.19 is the most recent release
+#       before that.
+FROM pangeo/pangeo-notebook:2021.02.19
 ARG DEBIAN_FRONTEND=noninteractive
 
 USER root
