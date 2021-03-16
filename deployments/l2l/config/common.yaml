@@ -345,18 +345,17 @@ daskhub:
 
         worker:
           extraContainerConfig:
-            # Allow all our worker pods unconditional access to the AWS
-            # account's S3 storage. This required some associated configuration
-            # in infra/eksctl-cluster-config.yaml!
-            serviceAccountName: "s3-full-access"
-            # Pack scheduler and worker pods on nodes just like we do with the
-            # user pods to help scale down not needed nodes.
-            schedulerName: l2l-prod-user-scheduler
             securityContext:
               runAsGroup: 1000
               runAsUser: 1000
           extraPodConfig:
+            # Pack scheduler and worker pods on nodes just like we do with the
+            # user pods to help scale down not needed nodes.
             schedulerName: l2l-prod-user-scheduler
+            # Allow all our worker pods unconditional access to the AWS
+            # account's S3 storage. This required some associated configuration
+            # in infra/eksctl-cluster-config.yaml!
+            serviceAccountName: "s3-full-access"
             securityContext:
               fsGroup: 1000
             nodeSelector:
