@@ -198,17 +198,17 @@ daskhub:
                   {
                       'default': True,
                       'display_name': 'Small',
-                      'description': '6GB RAM',
+                      'description': '6GB RAM guaranteed, max 12GB',
                       'kubespawner_override': { 'mem_guarantee':' 6G', 'mem_limit':' 12G' },
                   },
                   {
                       'display_name': 'Medium',
-                      'description': '12GB RAM',
+                      'description': '12GB RAM guaranteed, max 24GB',
                       'kubespawner_override': { 'mem_guarantee': '12G', 'mem_limit':' 24G' },
                   },
                   {
                       'display_name': 'Large',
-                      'description': '24GB RAM',
+                      'description': '24GB RAM guaranteed, max 48GB',
                       'kubespawner_override': { 'mem_guarantee': '24G', 'mem_limit':' 48G' },
                   },
               ]
@@ -345,18 +345,17 @@ daskhub:
 
         worker:
           extraContainerConfig:
-            # Allow all our worker pods unconditional access to the AWS
-            # account's S3 storage. This required some associated configuration
-            # in infra/eksctl-cluster-config.yaml!
-            serviceAccountName: "s3-full-access"
-            # Pack scheduler and worker pods on nodes just like we do with the
-            # user pods to help scale down not needed nodes.
-            schedulerName: l2l-prod-user-scheduler
             securityContext:
               runAsGroup: 1000
               runAsUser: 1000
           extraPodConfig:
+            # Pack scheduler and worker pods on nodes just like we do with the
+            # user pods to help scale down not needed nodes.
             schedulerName: l2l-prod-user-scheduler
+            # Allow all our worker pods unconditional access to the AWS
+            # account's S3 storage. This required some associated configuration
+            # in infra/eksctl-cluster-config.yaml!
+            serviceAccountName: "s3-full-access"
             securityContext:
               fsGroup: 1000
             nodeSelector:
