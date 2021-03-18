@@ -11,6 +11,5 @@
 # this script to fail. If so, then perhaps this could work:
 # https://stackoverflow.com/questions/64786/error-handling-in-bash
 
-source /home/jovyan/.bashrc
-conda activate notebook
-python -m pip install git+https://github.com/learning-2-learn/lfp_tools || true
+# Always install the latest lfp_tools which is in active development
+pip install git+https://github.com/learning-2-learn/lfp_tools || true
