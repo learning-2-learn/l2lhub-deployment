@@ -14,13 +14,11 @@
 # for example by plotly and itk-jupyter-widgets with 3D things.
 c.NotebookApp.iopub_data_rate_limit = 1e12
 
-# Configuration of nb_conda_kernels that converts conda environments to conda
-# kernels, but only those that are not already listed.
+# Configuration of nb_conda_kernels, which scans conda environments to register
+# jupyter kernels.
 #
 # ref: https://github.com/Anaconda-Platform/nb_conda_kernels
-c.CondaKernelSpecManager.name_format = '{1}'
-# This filter is to avoid having the jupyterlab launcher show a duplicated entry
-# for Python and Octave as there are two duplicated environments, the "base" and
-# "notebook" conda environment. Like this, we only use the "base" environment
-# which should be the same.
-c.CondaKernelSpecManager.env_filter = '"((?!envs/notebook).)*"'
+#
+# The jupyter kernels in the conda environment named "notebook" are detected by
+# default, so we use the env_filter option to not register them twice.
+c.CondaKernelSpecManager.env_filter = ".*envs/notebook.*"

@@ -76,6 +76,7 @@ daskhub:
           exec:
             command:
               - "bash"
+              - "--login" # to activate conda environments correctly
               - "/etc/singleuser/k8s-lifecycle-hook-post-start.sh"
       storage:
         storage:
