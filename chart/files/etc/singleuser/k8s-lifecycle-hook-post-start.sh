@@ -13,3 +13,11 @@
 
 # Always install the latest lfp_tools which is in active development
 pip install git+https://github.com/learning-2-learn/lfp_tools || true
+
+# Always re-set restrictive permissions on the SSH keys, as our NFS storage
+# setup cause it to have default permissions on pod restart. The reason for
+# having restrictive permissions is that tools will react if they are too high.
+# If a user wants to update these, the user would just need to elevate
+# permissions as an owner of the files first.
+chmod 400 /home/jovyan/.ssh/id_* || true
+chmod 600 /home/jovyan/.ssh/known_hosts || true
