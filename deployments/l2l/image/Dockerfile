@@ -79,6 +79,8 @@ RUN echo "Installing pip packages..." \
             # ref: https://github.com/pierreablin/picard
         seaborn \
             # ref: https://github.com/mwaskom/seaborn
+        statsmodels \
+            # ref: https://github.com/statsmodels/statsmodels
  && echo "Installing pip packages complete!"
 
 
