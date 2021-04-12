@@ -108,7 +108,15 @@ nodeGroups:
       withAddonPolicies:
         autoScaler: true
 
-  - name: worker-a
+  # Important about spot nodes!
+  #
+  # "Due to the Cluster Autoscaler’s limitations (more on that in the next
+  # section) on which Instance type to expand, it’s important to choose
+  # instances of the same size (vCPU and memory) for each InstanceGroup."
+  #
+  # ref: https://medium.com/riskified-technology/run-kubernetes-on-aws-ec2-spot-instances-with-zero-downtime-f7327a95dea
+  #
+  - name: worker-xlarge
     availabilityZones: [us-west-2d, us-west-2b, us-west-2a]
     minSize: 0
     maxSize: 20
@@ -126,17 +134,61 @@ nodeGroups:
         autoScaler: true
     # Spot instance configuration
     instancesDistribution:  # ref: https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-autoscaling-autoscalinggroup-instancesdistribution.html
-      # By providing more options both in the availability zone and instance
-      # type, we allow for better cost pricing optimizations.
       instanceTypes:
         - m5.xlarge    # 57 pods, 4 cpu, 16 GB
-        - m5.2xlarge   # 57 pods, 8 cpu, 32 GB
-        - m5.4xlarge   # 233 pods, 16 cpu, 64 GB
         - m5a.xlarge    # 57 pods, 4 cpu, 16 GB
-        - m5a.2xlarge   # 57 pods, 8 cpu, 32 GB
-        - m5a.4xlarge   # 233 pods, 16 cpu, 64 GB
         - m5n.xlarge    # 57 pods, 4 cpu, 16 GB
+      onDemandBaseCapacity: 0
+      onDemandPercentageAboveBaseCapacity: 0
+      spotAllocationStrategy: "capacity-optimized"  # ref: https://aws.amazon.com/blogs/compute/introducing-the-capacity-optimized-allocation-strategy-for-amazon-ec2-spot-instances/
+
+  - name: worker-2xlarge
+    availabilityZones: [us-west-2d, us-west-2b, us-west-2a]
+    minSize: 0
+    maxSize: 20
+    desiredCapacity: 0
+    volumeSize: 80
+    labels:
+      worker: "true"
+    taints:
+      worker: "true:NoSchedule"
+    tags:
+      k8s.io/cluster-autoscaler/node-template/label/worker: "true"
+      k8s.io/cluster-autoscaler/node-template/taint/worker: "true:NoSchedule"
+    iam:
+      withAddonPolicies:
+        autoScaler: true
+    # Spot instance configuration
+    instancesDistribution:  # ref: https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-autoscaling-autoscalinggroup-instancesdistribution.html
+      instanceTypes:
+        - m5.2xlarge   # 57 pods, 8 cpu, 32 GB
+        - m5a.2xlarge   # 57 pods, 8 cpu, 32 GB
         - m5n.2xlarge   # 57 pods, 8 cpu, 32 GB
+      onDemandBaseCapacity: 0
+      onDemandPercentageAboveBaseCapacity: 0
+      spotAllocationStrategy: "capacity-optimized"  # ref: https://aws.amazon.com/blogs/compute/introducing-the-capacity-optimized-allocation-strategy-for-amazon-ec2-spot-instances/
+
+  - name: worker-4xlarge
+    availabilityZones: [us-west-2d, us-west-2b, us-west-2a]
+    minSize: 0
+    maxSize: 20
+    desiredCapacity: 0
+    volumeSize: 80
+    labels:
+      worker: "true"
+    taints:
+      worker: "true:NoSchedule"
+    tags:
+      k8s.io/cluster-autoscaler/node-template/label/worker: "true"
+      k8s.io/cluster-autoscaler/node-template/taint/worker: "true:NoSchedule"
+    iam:
+      withAddonPolicies:
+        autoScaler: true
+    # Spot instance configuration
+    instancesDistribution:  # ref: https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-autoscaling-autoscalinggroup-instancesdistribution.html
+      instanceTypes:
+        - m5.4xlarge   # 233 pods, 16 cpu, 64 GB
+        - m5a.4xlarge   # 233 pods, 16 cpu, 64 GB
         - m5n.4xlarge   # 233 pods, 16 cpu, 64 GB
       onDemandBaseCapacity: 0
       onDemandPercentageAboveBaseCapacity: 0
