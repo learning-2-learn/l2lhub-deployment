@@ -44,7 +44,7 @@ RUN echo "Installing pip packages..." \
             # ref: https://github.com/machenslab/dPCA
         fooof==1.0.* \
             # ref: https://github.com/fooof-tools/fooof, 1.0.0 is out now
-        git+https://github.com/ahwillia/tensortools@b6ab505 \
+        git+https://github.com/ahwillia/tensortools@1790db3975845 \
             # ref: https://github.com/ahwillia/tensortools, pinned to a commit that works on May 17th, 2021
         git+https://github.com/h5py/h5py.git \
             # ref: https://github.com/h5py/h5py
