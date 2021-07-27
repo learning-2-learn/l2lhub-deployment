@@ -8,13 +8,13 @@ dependencies:
   # DaskHub (JupyterHub + Dask-Gateway with a little configuration in hub.extraConfig)
   # https://github.com/dask/helm-chart/tree/master/daskhub
   - name: daskhub
-    version: 4.5.6  # https://github.com/dask/helm-chart/blob/4.5.5/daskhub/Chart.yaml
+    version: 2021.7.2  # https://github.com/dask/helm-chart/blob/4.5.5/daskhub/Chart.yaml
     repository: https://helm.dask.org
 
   # # JupyterHub
   # # https://github.com/jupyterhub/zero-to-jupyterhub-k8s/jupyterhub
   # - name: jupyterhub
-  #   version: 0.10.2
+  #   version: 1.1.1
   #   repository: https://jupyterhub.github.io/helm-chart/
 
   # # Dask Gateway
@@ -28,7 +28,7 @@ dependencies:
   # Prometheus for collection of metrics.
   # https://github.com/prometheus-community/helm-charts/tree/main/charts/prometheus
   - name: prometheus
-    version: 11.16.8
+    version: 14.4.1
     repository: https://prometheus-community.github.io/helm-charts
     tags:
       - metrics
@@ -36,7 +36,7 @@ dependencies:
   # Grafana for dashboarding of metrics.
   # https://github.com/grafana/helm-charts/tree/main/charts/grafana
   - name: grafana
-    version: 6.1.7
+    version: 6.14.1
     repository: https://grafana.github.io/helm-charts
     tags:
       - metrics
