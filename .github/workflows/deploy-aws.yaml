@@ -40,14 +40,25 @@ jobs:
         sudo apt-get install amazon-ecr-credential-helper
 
         # sops
-        curl -sSL https://github.com/mozilla/sops/releases/download/v3.6.1/sops_3.6.1_amd64.deb -o /tmp/sops.deb
+        curl -sSL https://github.com/mozilla/sops/releases/download/v3.7.1/sops_3.7.1_amd64.deb -o /tmp/sops.deb
         sudo apt-get install /tmp/sops.deb
 
         # helm
-        curl https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 | bash
+        curl https://raw.githubusercontent.com/helm/helm/HEAD/scripts/get-helm-3 | bash
 
         # hubploy
-        pip install https://github.com/yuvipanda/hubploy/archive/master.zip
+        #
+        # six installed as a workaround to
+        # https://github.com/docker/docker-py/pull/2844 not being merged and
+        # released yet
+        pip install six
+
+        # repo2docker HEAD installed as a workaround to
+        # https://github.com/jupyterhub/repo2docker/pull/1064 not being released
+        # yet
+        pip install https://github.com/jupyterhub/repo2docker/archive/HEAD.zip
+
+        pip install https://github.com/yuvipanda/hubploy/archive/HEAD.zip
     
     - name: Log environment details
       run: |
