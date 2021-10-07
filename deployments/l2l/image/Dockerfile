@@ -81,6 +81,10 @@ RUN echo "Installing pip packages..." \
             # ref: https://github.com/mwaskom/seaborn
         statsmodels \
             # ref: https://github.com/statsmodels/statsmodels
+        xgboost \ 
+            # https://xgboost.readthedocs.io/en/latest/
+        shap \ 
+            # https://github.com/slundberg/shap
  && echo "Installing pip packages complete!"
 
 
