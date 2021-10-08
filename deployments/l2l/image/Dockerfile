@@ -17,6 +17,7 @@ RUN echo "Installing apt-get packages..." \
         gcc \
         nano \
         octave \
+        g++ \ 
     && rm -rf /var/lib/apt/lists/*
 USER ${NB_USER}
 
