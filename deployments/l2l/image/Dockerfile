@@ -52,11 +52,9 @@ RUN echo "Installing pip packages..." \
         neurodsp \
             # ref: https://github.com/neurodsp-tools/neurodsp
         jupyterlab_hdf \
-            # NOTE: Currently does not support JupyterLab 3 it seems:
-            #       https://github.com/jupyterlab/jupyterlab-hdf5/issues/42
-            # NOTE: Has an associated JupyterLab extension that needs to be
-            #       installed explicitly as of 2021-03-06.
             # ref: https://github.com/jupyterlab/jupyterlab-hdf5
+        lckr-jupyterlab-variableinspector \
+            # ref: https://github.com/lckr/jupyterlab-variableInspector
         line_profiler \
             # ref: https://github.com/pyutils/line_profiler
         mne \
@@ -91,17 +89,6 @@ RUN echo "Installing pip packages..." \
             #
             # https://github.com/microsoft/graspologic, as requested by John Ferre
  && echo "Installing pip packages complete!"
-
-
-
-RUN echo "Installing jupyterlab extensions..." \
-    && export PATH=${NB_PYTHON_PREFIX}/bin:${PATH} \
-    && jupyter labextension install -y --clean \
-        @lckr/jupyterlab_variableinspector \
-        @jupyterlab/hdf5 \
-        bqplot \
- && echo "Installing jupyterlab extensions complete!"
-
 
 
 RUN echo "Enabling jupyter serverextensions..." \
