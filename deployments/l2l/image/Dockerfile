@@ -36,20 +36,20 @@ RUN echo "Installing pip packages..." \
     ${NB_PYTHON_PREFIX}/bin/pip install --no-cache-dir --no-binary=h5py \
         bqplot \
             # ref: https://github.com/bqplot/bqplot
-        bycycle==0.1.* \
+        bycycle \
             # ref: https://github.com/bycycle-tools/bycycle
         dpca \
             # ref: https://github.com/machenslab/dPCA
-        fooof==1.0.* \
+        fooof \
             # ref: https://github.com/fooof-tools/fooof, 1.0.0 is out now
         git+https://github.com/ahwillia/tensortools@1790db3975845 \
             # ref: https://github.com/ahwillia/tensortools, pinned to a commit that works on May 17th, 2021
-        git+https://github.com/h5py/h5py.git \
+        h5py \
             # ref: https://github.com/h5py/h5py
             # NOTE: Let h5py install before HDF5Zarr
         git+https://github.com/catalystneuro/HDF5Zarr.git \
             # ref: https://github.com/catalystneuro/HDF5Zarr
-        git+https://github.com/neurodsp-tools/neurodsp@ed82caa2d93606d1500de0997dce962b81bc69eb \
+        neurodsp \
             # ref: https://github.com/neurodsp-tools/neurodsp
         jupyterlab_hdf \
             # NOTE: Currently does not support JupyterLab 3 it seems:
