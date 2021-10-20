@@ -4,10 +4,7 @@
 # pangeo/pangeo-notebook tags: https://hub.docker.com/r/pangeo/pangeo-notebook/tags
 # pangeo-notebook conda package: https://github.com/conda-forge/pangeo-notebook-feedstock/blob/master/recipe/meta.yaml
 #
-# NOTE: pangeo/pangeo-notebook:2021.03.01 bumps JupyterLab 2 to JupyterLab 3
-#       which is likeley quite breaking. 2021.02.19 is the most recent release
-#       before that.
-FROM pangeo/pangeo-notebook:2021.02.19
+FROM pangeo/pangeo-notebook:2021.10.19
 ARG DEBIAN_FRONTEND=noninteractive
 
 USER root
@@ -17,7 +14,7 @@ RUN echo "Installing apt-get packages..." \
         gcc \
         nano \
         octave \
-        g++ \ 
+        g++ \
     && rm -rf /var/lib/apt/lists/*
 USER ${NB_USER}
 
