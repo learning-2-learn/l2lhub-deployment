@@ -86,6 +86,8 @@ RUN echo "Installing pip packages..." \
             # https://xgboost.readthedocs.io/en/latest/
         shap \ 
             # https://github.com/slundberg/shap
+        graspologic \
+            # https://github.com/microsoft/graspologic, as requested by John Ferre
  && echo "Installing pip packages complete!"
 
 
