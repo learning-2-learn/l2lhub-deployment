@@ -4,10 +4,7 @@
 # pangeo/pangeo-notebook tags: https://hub.docker.com/r/pangeo/pangeo-notebook/tags
 # pangeo-notebook conda package: https://github.com/conda-forge/pangeo-notebook-feedstock/blob/master/recipe/meta.yaml
 #
-# NOTE: pangeo/pangeo-notebook:2021.03.01 bumps JupyterLab 2 to JupyterLab 3
-#       which is likeley quite breaking. 2021.02.19 is the most recent release
-#       before that.
-FROM pangeo/pangeo-notebook:2021.02.19
+FROM pangeo/pangeo-notebook:2021.10.19
 ARG DEBIAN_FRONTEND=noninteractive
 
 USER root
@@ -17,7 +14,7 @@ RUN echo "Installing apt-get packages..." \
         gcc \
         nano \
         octave \
-        g++ \ 
+        g++ \
     && rm -rf /var/lib/apt/lists/*
 USER ${NB_USER}
 
@@ -39,27 +36,25 @@ RUN echo "Installing pip packages..." \
     ${NB_PYTHON_PREFIX}/bin/pip install --no-cache-dir --no-binary=h5py \
         bqplot \
             # ref: https://github.com/bqplot/bqplot
-        bycycle==0.1.* \
+        bycycle \
             # ref: https://github.com/bycycle-tools/bycycle
         dpca \
             # ref: https://github.com/machenslab/dPCA
-        fooof==1.0.* \
+        fooof \
             # ref: https://github.com/fooof-tools/fooof, 1.0.0 is out now
         git+https://github.com/ahwillia/tensortools@1790db3975845 \
             # ref: https://github.com/ahwillia/tensortools, pinned to a commit that works on May 17th, 2021
-        git+https://github.com/h5py/h5py.git \
+        h5py \
             # ref: https://github.com/h5py/h5py
             # NOTE: Let h5py install before HDF5Zarr
         git+https://github.com/catalystneuro/HDF5Zarr.git \
             # ref: https://github.com/catalystneuro/HDF5Zarr
-        git+https://github.com/neurodsp-tools/neurodsp@ed82caa2d93606d1500de0997dce962b81bc69eb \
+        neurodsp \
             # ref: https://github.com/neurodsp-tools/neurodsp
         jupyterlab_hdf \
-            # NOTE: Currently does not support JupyterLab 3 it seems:
-            #       https://github.com/jupyterlab/jupyterlab-hdf5/issues/42
-            # NOTE: Has an associated JupyterLab extension that needs to be
-            #       installed explicitly as of 2021-03-06.
             # ref: https://github.com/jupyterlab/jupyterlab-hdf5
+        lckr-jupyterlab-variableinspector \
+            # ref: https://github.com/lckr/jupyterlab-variableInspector
         line_profiler \
             # ref: https://github.com/pyutils/line_profiler
         mne \
@@ -86,20 +81,14 @@ RUN echo "Installing pip packages..." \
             # https://xgboost.readthedocs.io/en/latest/
         shap \ 
             # https://github.com/slundberg/shap
-        graspologic \
+        graspologic==0.3.1.dev1346960477 \
+            # Installing 0.3.0 causes an install of matplotlib 3.3.0, which in
+            # turn breaks while installing. This is likely related to
+            # https://github.com/microsoft/graspologic/pull/854 but I'm a bit
+            # confused why we don't install an even newer version of matplotlib.
+            #
             # https://github.com/microsoft/graspologic, as requested by John Ferre
  && echo "Installing pip packages complete!"
-
-
-
-RUN echo "Installing jupyterlab extensions..." \
-    && export PATH=${NB_PYTHON_PREFIX}/bin:${PATH} \
-    && jupyter labextension install -y --clean \
-        @lckr/jupyterlab_variableinspector \
-        @jupyterlab/hdf5 \
-        bqplot \
- && echo "Installing jupyterlab extensions complete!"
-
 
 
 RUN echo "Enabling jupyter serverextensions..." \
