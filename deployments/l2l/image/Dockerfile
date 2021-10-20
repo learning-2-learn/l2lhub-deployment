@@ -83,7 +83,12 @@ RUN echo "Installing pip packages..." \
             # https://xgboost.readthedocs.io/en/latest/
         shap \ 
             # https://github.com/slundberg/shap
-        graspologic \
+        graspologic==0.3.1.dev1346960477 \
+            # Installing 0.3.0 causes an install of matplotlib 3.3.0, which in
+            # turn breaks while installing. This is likely related to
+            # https://github.com/microsoft/graspologic/pull/854 but I'm a bit
+            # confused why we don't install an even newer version of matplotlib.
+            #
             # https://github.com/microsoft/graspologic, as requested by John Ferre
  && echo "Installing pip packages complete!"
 
