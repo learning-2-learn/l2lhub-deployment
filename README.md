@@ -3,4 +3,4 @@
 
 # Learning-2-Learn's JupyterHub deployment
 
-See the documentation at https://docs.l2l.sundellopensource.com and the deployment at https://l2l.sundellopensource.com.
+Documentation about this deployment is available at https://docs.l2l.sundellopensource.com, and the JupyterHub is available at https://l2l.sundellopensource.com.
