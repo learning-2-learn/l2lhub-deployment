@@ -47,17 +47,6 @@ jobs:
         curl https://raw.githubusercontent.com/helm/helm/HEAD/scripts/get-helm-3 | bash
 
         # hubploy
-        #
-        # six installed as a workaround to
-        # https://github.com/docker/docker-py/pull/2844 not being merged and
-        # released yet
-        pip install six
-
-        # repo2docker HEAD installed as a workaround to
-        # https://github.com/jupyterhub/repo2docker/pull/1064 not being released
-        # yet
-        pip install https://github.com/jupyterhub/repo2docker/archive/HEAD.zip
-
         pip install https://github.com/yuvipanda/hubploy/archive/HEAD.zip
     
     - name: Log environment details

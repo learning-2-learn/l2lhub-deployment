@@ -6,9 +6,30 @@ version: 0.1.0
 
 dependencies:
   # DaskHub (JupyterHub + Dask-Gateway with a little configuration in hub.extraConfig)
-  # https://github.com/dask/helm-chart/tree/master/daskhub
+  # https://github.com/dask/helm-chart/tree/main/daskhub
   - name: daskhub
-    version: 2021.7.2  # https://github.com/dask/helm-chart/blob/4.5.5/daskhub/Chart.yaml
+    # NOTE: If you upgrade daskhub, check the version of jupyterhub and
+    #       dask-gateway you will upgrade from and to by inspecting the state of
+    #       the daskhub Chart.yaml file before and after. For example if you
+    #       upgrade from daskhub version 2021.7.2 to 2022.6.0, check the
+    #       jupyterhub/dask-gateway versions declared in these two Chart.yaml
+    #       files:
+    #
+    #       - https://github.com/dask/helm-chart/blob/2021.7.2/daskhub/Chart.yaml
+    #       - https://github.com/dask/helm-chart/blob/2022.6.0/daskhub/Chart.yaml
+    #
+    #       In this case, we can see that upgrading from daskhub 2021.7.2 to
+    #       2022.6.1 leads to bumping jupyterhub from 1.1.1 to 1.2.0, and
+    #       dask-gateway from 0.9.0 to 2022.6.1.
+    #
+    #       With this information, inspect the changelogs for these helm charts
+    #       and follow possible upgrade procedures if needed before making the
+    #       upgrade:
+    #
+    #       - Changelog for jupyterhub Helm chart: https://z2jh.jupyter.org/en/latest/changelog.html
+    #       - Changelog for dask-gateway Helm chart: https://gateway.dask.org/changelog.html
+    #
+    version: 2021.7.2  # https://github.com/dask/helm-chart/blob/2021.7.2/daskhub/Chart.yaml
     repository: https://helm.dask.org
 
   # # JupyterHub
@@ -18,7 +39,7 @@ dependencies:
   #   repository: https://jupyterhub.github.io/helm-chart/
 
   # # Dask Gateway
-  # # https://github.com/dask/dask-gateway/tree/master/resources/helm/dask-gateway
+  # # https://github.com/dask/dask-gateway/tree/main/resources/helm/dask-gateway
   # - name: dask-gateway
   #   version: 0.9.0
   #   repository: https://dask.org/dask-gateway-helm-repo/
